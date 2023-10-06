@@ -1,3 +1,6 @@
+#include "utils.hpp"
+#include "window.hpp"
+
 namespace rndrboi
 {
 
@@ -12,6 +15,7 @@ namespace rndrboi
 	void init();
 	void step();
 
+	std::shared_ptr<WindowBase> window;
     };
 
 };

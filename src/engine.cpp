@@ -1,11 +1,9 @@
-#include "utils.hpp"
 #include "engine.hpp"
 
 using namespace rndrboi;
 
 Engine::Engine()
 {
-    
 }
 
 Engine::~Engine()
@@ -15,16 +13,20 @@ Engine::~Engine()
 
 void Engine::init()
 {
-
+    window = Window::Instance()->get();
+    window->width = 1080;
+    window->height = 720;
+    window->title = "rndrboi";
+    window->init();
 }
 
 bool Engine::is_running()
 {
-    return true;
+    return window->is_open();
 }
 
 
 void Engine::step()
 {
-    std::cout << A_BLINK << A_FG(0,255,0) << "STEP" << A_RESET << " asdasd \n";;
+    window->handle_input();
 }

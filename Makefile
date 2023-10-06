@@ -36,7 +36,7 @@ lib_dir:
 
 ${OBJ_DIR}/%.o: ${SRC_DIR}/%.cpp
 	@echo "OBJ: " $< " -> " $@
-	@${CXX} ${FLAGS} ${INCLUDE} -c -o $@ $< $(CFLAGS)
+	@${CXX} ${FLAGS} -MMD ${INCLUDE} -c -o $@ $< $(CFLAGS)
 
 rndrboi_shared: lib_dir ${OBJ}
 	@echo "-------------------- RNDRBOI SHARED"
@@ -48,6 +48,7 @@ apps:
 	@${MAKE_CMD} apps/
 	@echo "\n"
 
+-include $(OBJ_DIR)/*.d
 
 clean:
 	@rm -rf ${LIB_PATH}
