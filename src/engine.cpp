@@ -26,5 +26,5 @@ bool Engine::is_running()
 
 void Engine::step()
 {
-    std::cout << "STEP\n";
+    std::cout << A_BLINK << A_FG(0,255,0) << "STEP" << A_RESET << " asdasd \n";;
 }

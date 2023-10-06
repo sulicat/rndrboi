@@ -15,7 +15,7 @@ LIBS 	=	-L /usr/lib/x86_64-linux-gnu \
 		-l rndrboi
 
 all: bin_lib
-	g++ simple_test.cpp ${LIBS} ${INCLUDE} -o ./bin/simple_test
+	@g++ simple_test.cpp ${LIBS} ${INCLUDE} -o ./bin/simple_test
 
 bin_lib:
 	@mkdir -p bin

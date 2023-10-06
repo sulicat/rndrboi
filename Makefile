@@ -35,15 +35,19 @@ lib_dir:
 	@${MKDIR_CMD} obj/
 
 ${OBJ_DIR}/%.o: ${SRC_DIR}/%.cpp
-	${CXX} ${FLAGS} ${INCLUDE} -c -o $@ $< $(CFLAGS)
+	@echo "OBJ: " $< " -> " $@
+	@${CXX} ${FLAGS} ${INCLUDE} -c -o $@ $< $(CFLAGS)
 
 rndrboi_shared: lib_dir ${OBJ}
 	@echo "-------------------- RNDRBOI SHARED"
 	${CXX} ${FLAGS} --shared ${OBJ} -o ${LIB_PATH}/shared/lib${LIB_NAME}.so
+	@echo "\n"
 
 apps:
 	@echo "-------------------- APPS"
 	@${MAKE_CMD} apps/
+	@echo "\n"
+
 
 clean:
 	@rm -rf ${LIB_PATH}
