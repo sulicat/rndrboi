@@ -2,6 +2,7 @@
 #define _UTILS_H_
 
 #include <iostream>
+#include <vector>
 #include <memory>
 
 #define A_RESET "\033[0m"
@@ -16,5 +17,28 @@
 #define A_GREEN A_FG(0,255,0)
 #define A_BLUE A_FG(0,0,255)
 #define A_YELLOW A_FG(255,255,0)
+
+namespace rndrboi
+{
+    namespace utils
+    {
+
+	// print a c list
+	void print_string_list( std::string prefix, char** list, int count, std::string suffix );
+
+	// convert a list to a vector
+	template <typename T>
+	std::vector<T> list_to_vec( T* list, int count )
+	{
+	    std::vector<T> out;
+	    for( int i = 0; i < count; i++ )
+	    {
+		out.push_back( list[i] );
+	    }
+	    return out;
+	}
+
+    }
+}
 
 #endif

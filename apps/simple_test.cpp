@@ -18,5 +18,7 @@ int main( int argc, char** argv )
 	engine.step();
     }
 
-    return 0;
+    int close_status = engine.close();
+
+    return close_status;
 }

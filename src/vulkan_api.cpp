@@ -1,0 +1,231 @@
+#include "vulkan_api.hpp"
+
+using namespace rndrboi;
+
+VulkanAPI* VulkanAPI::singleton_instance = NULL;
+
+VulkanAPI* VulkanAPI::Instance()
+{
+    if (!singleton_instance)
+    {
+	singleton_instance = new VulkanAPI;
+    }
+    return singleton_instance;
+}
+
+
+
+VKAPI_ATTR VkBool32 VKAPI_CALL VulkanAPI::debug_cb( VkDebugUtilsMessageSeverityFlagBitsEXT message_severity,
+						    VkDebugUtilsMessageTypeFlagsEXT message_type,
+						    const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
+						    void* pUserData)
+{
+    std::cout << A_RED << "[VULKAN ERROR] " << A_RESET
+	      << pCallbackData->pMessage
+	      << "\n";
+
+    return VK_FALSE;
+}
+
+VkResult CreateDebugUtilsMessengerEXT( VkInstance instance,
+				       const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
+				       const VkAllocationCallbacks* pAllocator,
+				       VkDebugUtilsMessengerEXT* pDebugMessenger)
+{
+    auto func = (PFN_vkCreateDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
+
+    if (func != nullptr)
+        return func(instance, pCreateInfo, pAllocator, pDebugMessenger);
+
+    return VK_ERROR_EXTENSION_NOT_PRESENT;
+}
+
+void DestroyDebugUtilsMessengerEXT( VkInstance instance,
+				    VkDebugUtilsMessengerEXT debugMessenger,
+				    const VkAllocationCallbacks* pAllocator )
+{
+    auto func = (PFN_vkDestroyDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
+
+    if (func != nullptr)
+        func(instance, debugMessenger, pAllocator);
+}
+
+
+//----------------------------------------------------------------------------------------------------
+
+void VulkanAPI::init_default()
+{
+    std::cout << A_YELLOW << "[VAPI] " << A_RESET << "init default\n";
+
+    create_vk_instance();
+    setup_debug_cb();
+}
+
+void VulkanAPI::create_vk_instance()
+{
+    supported_extensions = get_supported_extentions();
+    supported_layers = get_supported_layers();
+
+    VkApplicationInfo app_info{};
+    app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+    app_info.pApplicationName = "rndrboi app";
+    app_info.applicationVersion = VK_MAKE_VERSION(0,0,1);
+    app_info.pEngineName = "rndrboi";
+    app_info.engineVersion = VK_MAKE_VERSION(0,0,1);
+
+
+    if( Config::Instance()->window_manager == Config::WINDOW_MANAGER::GLFW )
+    {
+	uint32_t window_extension_count = 0;
+	const char** window_extensions;
+	window_extensions = glfwGetRequiredInstanceExtensions( &window_extension_count );
+
+	for( int i = 0; i < window_extension_count; i++ )
+	    extensions.push_back( window_extensions[i] );
+    }
+
+    for( const char* ext : added_extensions )
+	extensions.push_back(ext);
+
+    for( auto e : extensions )
+	std::cout << A_YELLOW << "[VAPI] " << A_RESET
+		  << "extension: " << e << "\n";
+
+
+    bool ext_support_ok = check_extension_support();
+    if( !ext_support_ok )
+    {
+	std::cout << A_RED << "[VAPI] " << A_RESET << "ERROR: Insufficiant extension support\n";
+	exit(-1);
+    }
+
+
+    VkInstanceCreateInfo create_info{};
+    create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+    create_info.pApplicationInfo = &app_info;
+    create_info.enabledExtensionCount = extensions.size();
+    create_info.ppEnabledExtensionNames = extensions.data();
+    create_info.enabledLayerCount = 0;
+
+
+    bool layer_support_ok = true;
+
+    if( Config::Instance()->enable_debug )
+    {
+	std::cout << A_YELLOW << "[VAPI] " << A_RESET << "debug " << A_YELLOW << "ENABLED" << A_RESET << " ... using validation layers\n";
+
+	layer_support_ok = check_layer_support();
+	if( !layer_support_ok )
+	{
+	    std::cout << A_RED << "[VAPI] " << A_RESET << "ERROR: Insufficiant validation layer support\n";
+	    exit(-1);
+	}
+
+	// enable validation layers
+	create_info.enabledLayerCount = static_cast<uint32_t>(validation_layers.size());
+	create_info.ppEnabledLayerNames = validation_layers.data();
+
+    }
+    else
+    {
+	std::cout << A_YELLOW << "[VAPI] " << A_RESET << "debug " << A_YELLOW << "DISABLED" << A_RESET << " ... no validation layers\n";
+
+	// no validation layers
+	create_info.enabledLayerCount = 0;
+    }
+
+    vkCreateInstance( &create_info,
+		      nullptr,
+		      &instance );
+
+}
+
+void VulkanAPI::cleanup()
+{
+
+    DestroyDebugUtilsMessengerEXT( instance,
+				   debug_messenger,
+				   nullptr );
+
+    vkDestroyInstance(instance, nullptr);
+
+    std::cout << A_YELLOW << "[VAPI] " << A_RESET << "cleanup\n";
+}
+
+std::vector<VkExtensionProperties> VulkanAPI::get_supported_extentions()
+{
+    uint32_t extensionCount = 0;
+    vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
+    std::vector<VkExtensionProperties> out( extensionCount );
+    vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, out.data());
+    return out;
+}
+
+std::vector<VkLayerProperties> VulkanAPI::get_supported_layers()
+{
+    uint32_t layer_count = 0;
+    vkEnumerateInstanceLayerProperties(&layer_count, nullptr);
+    std::vector<VkLayerProperties> out( layer_count );
+    vkEnumerateInstanceLayerProperties(&layer_count, out.data());
+    return out;
+}
+
+
+bool VulkanAPI::check_layer_support()
+{
+    for( auto val_layer : validation_layers )
+    {
+	bool found = false;
+	for( auto supp_layer : supported_layers )
+	{
+	    if( std::string(supp_layer.layerName) == std::string(val_layer) )
+		found = true;
+	}
+
+	if( !found )
+	{
+	    std::cout << A_RED << "[VAPI] " << A_RESET << "cound not find: " << val_layer << "\n";
+	    return false;
+	}
+    }
+
+    return true;
+}
+
+bool VulkanAPI::check_extension_support()
+{
+    for( auto ext : extensions )
+    {
+	bool found = false;
+	for( auto supp_ext : supported_extensions )
+	{
+	    if( std::string(supp_ext.extensionName) == ext )
+		found = true;
+	}
+
+	if( !found )
+	{
+	    std::cout << A_RED << "[VAPI] " << A_RESET << "cound not find: " << ext << "\n";
+	    return false;
+	}
+
+    }
+
+    return true;
+}
+
+void VulkanAPI::setup_debug_cb()
+{
+    VkDebugUtilsMessengerCreateInfoEXT create_info{};
+    create_info.sType		= VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+    create_info.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+    create_info.messageType	= VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+    create_info.pfnUserCallback = debug_cb;
+    create_info.pUserData	= nullptr;
+
+    CreateDebugUtilsMessengerEXT( instance,
+				  &create_info,
+				  nullptr,
+				  &debug_messenger );
+
+}

@@ -18,6 +18,9 @@ void Engine::init()
     window->height = 720;
     window->title = "rndrboi";
     window->init();
+
+    VulkanAPI::Instance()->init_default();
+
 }
 
 bool Engine::is_running()
@@ -29,4 +32,12 @@ bool Engine::is_running()
 void Engine::step()
 {
     window->handle_input();
+}
+
+int Engine::close()
+{
+    VulkanAPI::Instance()->cleanup();
+    Window::Instance()->cleanup();
+
+    return 0;
 }

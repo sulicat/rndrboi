@@ -1,3 +1,6 @@
+#ifndef _WINDOW_H_
+#define _WINDOW_H_
+
 #include "utils.hpp"
 
 namespace rndrboi
@@ -11,6 +14,7 @@ namespace rndrboi
 	virtual void init() = 0;
 	virtual void handle_input() = 0;
 	virtual bool is_open() = 0;
+	virtual void cleanup() = 0;
 
 	int width;
 	int height;
@@ -31,6 +35,7 @@ namespace rndrboi
 	void init();
 	void handle_input();
 	bool is_open();
+	void cleanup();
 
 	GLFWwindow* window;
     };
@@ -44,13 +49,17 @@ namespace rndrboi
 
 	static Window* Instance();
 	std::shared_ptr<WindowBase> get();
+	void cleanup();
 
     private:
 	Window(){}
 	~Window(){}
 
+	std::shared_ptr<WindowBase> platform_window;
 	static Window* instance;
     };
 
 
 }
+
+#endif

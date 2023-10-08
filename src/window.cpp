@@ -9,14 +9,21 @@ Window* Window::instance = NULL;
 Window* Window::Instance(){
     if (!instance){
 	instance = new Window;
+	instance->platform_window = std::shared_ptr<WindowBase>(new WindowGLFW);
     }
     return instance;
 }
 
 std::shared_ptr<WindowBase> Window::get()
 {
-    std::cout << A_YELLOW << "[WINDOW] " << A_RESET << " : GLFW WINDOW\n";
-    return std::shared_ptr<WindowBase>(new WindowGLFW);
+    std::cout << A_YELLOW << "[WINDOW] " << A_RESET << "GLFW WINDOW\n";
+    return platform_window;
+}
+
+void Window::cleanup()
+{
+    std::cout << A_YELLOW << "[WINDOW] " << A_RESET << "cleanup\n";
+    platform_window->cleanup();
 }
 
 // ----------------------------------------------------------------------------------------------------
@@ -31,6 +38,12 @@ WindowGLFW::WindowGLFW()
 WindowGLFW::~WindowGLFW()
 {
     free(window);
+}
+
+void WindowGLFW::cleanup()
+{
+    glfwDestroyWindow(window);
+    glfwTerminate();
 }
 
 void WindowGLFW::init()
