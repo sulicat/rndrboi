@@ -1,4 +1,5 @@
 #include "vulkan_api.hpp"
+#include "vulkan_api_helpers.hpp"
 
 using namespace rndrboi;
 
@@ -14,7 +15,6 @@ VulkanAPI* VulkanAPI::Instance()
 }
 
 
-
 VKAPI_ATTR VkBool32 VKAPI_CALL VulkanAPI::debug_cb( VkDebugUtilsMessageSeverityFlagBitsEXT message_severity,
 						    VkDebugUtilsMessageTypeFlagsEXT message_type,
 						    const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
@@ -27,29 +27,6 @@ VKAPI_ATTR VkBool32 VKAPI_CALL VulkanAPI::debug_cb( VkDebugUtilsMessageSeverityF
     return VK_FALSE;
 }
 
-VkResult CreateDebugUtilsMessengerEXT( VkInstance instance,
-				       const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
-				       const VkAllocationCallbacks* pAllocator,
-				       VkDebugUtilsMessengerEXT* pDebugMessenger)
-{
-    auto func = (PFN_vkCreateDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
-
-    if (func != nullptr)
-        return func(instance, pCreateInfo, pAllocator, pDebugMessenger);
-
-    return VK_ERROR_EXTENSION_NOT_PRESENT;
-}
-
-void DestroyDebugUtilsMessengerEXT( VkInstance instance,
-				    VkDebugUtilsMessengerEXT debugMessenger,
-				    const VkAllocationCallbacks* pAllocator )
-{
-    auto func = (PFN_vkDestroyDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
-
-    if (func != nullptr)
-        func(instance, debugMessenger, pAllocator);
-}
-
 
 //----------------------------------------------------------------------------------------------------
 
@@ -59,6 +36,13 @@ void VulkanAPI::init_default()
 
     create_vk_instance();
     setup_debug_cb();
+    update_physical_devices();
+
+}
+
+void VulkanAPI::update_physical_devices()
+{
+
 }
 
 void VulkanAPI::create_vk_instance()
@@ -222,6 +206,7 @@ void VulkanAPI::setup_debug_cb()
     create_info.messageType	= VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
     create_info.pfnUserCallback = debug_cb;
     create_info.pUserData	= nullptr;
+
 
     CreateDebugUtilsMessengerEXT( instance,
 				  &create_info,

@@ -13,12 +13,17 @@ namespace rndrboi
     {
     public:
 
+	//--------------------------------------------------------------------------------
+
 	void init_default();
 	void setup_debug_cb();
+	void update_physical_devices();
 	void cleanup();
 	static VulkanAPI* Instance();
 
     private:
+
+	//--------------------------------------------------------------------------------
 
 	const std::vector<const char*> validation_layers = {
 	    "VK_LAYER_KHRONOS_validation"
@@ -33,15 +38,18 @@ namespace rndrboi
 							const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
 							void* pUserData);
 
+	//--------------------------------------------------------------------------------
 
 	VulkanAPI(){}
 	~VulkanAPI(){ cleanup(); }
+
 	void create_vk_instance();
 	std::vector<VkExtensionProperties> get_supported_extentions();
 	std::vector<VkLayerProperties> get_supported_layers();
 	bool check_layer_support();
 	bool check_extension_support();
 
+	//--------------------------------------------------------------------------------
 
 	VkInstance instance;
 	std::vector<VkExtensionProperties> supported_extensions;

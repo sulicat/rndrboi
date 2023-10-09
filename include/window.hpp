@@ -3,6 +3,9 @@
 
 #include "utils.hpp"
 
+#define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
+
 namespace rndrboi
 {
     // ----------------------------------------------------------------------------------------------------
@@ -22,9 +25,6 @@ namespace rndrboi
     };
 
     // ----------------------------------------------------------------------------------------------------
-
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
 
     class WindowGLFW : public WindowBase
     {
