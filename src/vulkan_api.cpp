@@ -14,20 +14,6 @@ VulkanAPI* VulkanAPI::Instance()
     return singleton_instance;
 }
 
-
-VKAPI_ATTR VkBool32 VKAPI_CALL VulkanAPI::debug_cb( VkDebugUtilsMessageSeverityFlagBitsEXT message_severity,
-						    VkDebugUtilsMessageTypeFlagsEXT message_type,
-						    const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
-						    void* pUserData)
-{
-    std::cout << A_RED << "[VULKAN ERROR] " << A_RESET
-	      << pCallbackData->pMessage
-	      << "\n";
-
-    return VK_FALSE;
-}
-
-
 //----------------------------------------------------------------------------------------------------
 
 void VulkanAPI::init_default()
@@ -37,12 +23,61 @@ void VulkanAPI::init_default()
     create_vk_instance();
     setup_debug_cb();
     update_physical_devices();
-
+    choose_device_auto();
 }
 
 void VulkanAPI::update_physical_devices()
 {
+    uint32_t device_count = 0;
+    vkEnumeratePhysicalDevices(instance, &device_count, nullptr);
+    devices = std::vector<VkPhysicalDevice>( device_count );
+    vkEnumeratePhysicalDevices(instance, &device_count, devices.data());
+}
 
+void VulkanAPI::choose_device_auto()
+{
+    std::cout << A_YELLOW << "[VAPI] " << A_RESET << "Choosing Device:\n";
+
+    for( auto dev : devices )
+    {
+	VkPhysicalDeviceProperties props;
+	VkPhysicalDeviceFeatures features;
+	vkGetPhysicalDeviceProperties(dev, &props);
+	vkGetPhysicalDeviceFeatures(dev, &features);
+
+	std::cout << A_YELLOW << "[VAPI] " << A_RESET << " -> " << props.deviceName << "\n";
+
+
+	if( props.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU )
+	{
+	    bool queue_family_status = check_queue_families( dev );
+
+	    std::cout << A_YELLOW << "[VAPI] " << A_RESET << "     " << "Discrete GPU found\n";
+	    std::cout << A_YELLOW << "[VAPI] " << A_RESET << "     " << "Vulkan version supported: " << props.apiVersion << "\n";
+	    std::cout << A_YELLOW << "[VAPI] " << A_RESET << "     " << "Queue families check: " << queue_family_status << "\n";
+	    std::cout << A_YELLOW << "[VAPI] " << A_RESET << "     " << A_GREEN << "CHOSEN" << A_RESET << "\n";
+	    selected_device = dev;
+	}
+    }
+}
+
+bool VulkanAPI::check_queue_families( VkPhysicalDevice dev )
+{
+
+    uint32_t q_fam_count = 0;
+    vkGetPhysicalDeviceQueueFamilyProperties(dev, &q_fam_count, nullptr);
+    std::vector<VkQueueFamilyProperties> q_fams(q_fam_count);
+    vkGetPhysicalDeviceQueueFamilyProperties(dev, &q_fam_count, q_fams.data());
+
+    bool found_graphics = false;
+
+    for( auto q : q_fams )
+    {
+	if ( q.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+	    found_graphics = true;
+    }
+
+    return found_graphics;
 }
 
 void VulkanAPI::create_vk_instance()
@@ -113,7 +148,6 @@ void VulkanAPI::create_vk_instance()
     else
     {
 	std::cout << A_YELLOW << "[VAPI] " << A_RESET << "debug " << A_YELLOW << "DISABLED" << A_RESET << " ... no validation layers\n";
-
 	// no validation layers
 	create_info.enabledLayerCount = 0;
     }
@@ -127,10 +161,7 @@ void VulkanAPI::create_vk_instance()
 void VulkanAPI::cleanup()
 {
 
-    DestroyDebugUtilsMessengerEXT( instance,
-				   debug_messenger,
-				   nullptr );
-
+    DestroyDebugUtilsMessengerEXT( instance, debug_messenger, nullptr );
     vkDestroyInstance(instance, nullptr);
 
     std::cout << A_YELLOW << "[VAPI] " << A_RESET << "cleanup\n";

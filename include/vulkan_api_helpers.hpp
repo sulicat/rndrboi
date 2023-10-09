@@ -12,5 +12,11 @@ void DestroyDebugUtilsMessengerEXT( VkInstance instance,
 				    VkDebugUtilsMessengerEXT debugMessenger,
 				    const VkAllocationCallbacks* pAllocator );
 
+
+VKAPI_ATTR VkBool32 VKAPI_CALL debug_cb( VkDebugUtilsMessageSeverityFlagBitsEXT message_severity,
+					 VkDebugUtilsMessageTypeFlagsEXT message_type,
+					 const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
+					 void* pUserData);
+
 #endif
 

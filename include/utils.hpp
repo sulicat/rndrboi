@@ -38,6 +38,24 @@ namespace rndrboi
 	    return out;
 	}
 
+
+	template <typename IN, typename OUT, typename NAME, typename T>
+	std::vector<OUT> member_vec( std::vector<T> input )
+	{
+	    std::vector<OUT> out( input.size() );
+	    for( auto x : input )
+		out.push_back( x.NAME );
+
+	    return out;
+	}
+
+	template <typename T>
+	void print_vec( std::vector<T> in, std::string prefix = "", std::string suffix = "" )
+	{
+	    for( auto x : in )
+		std::cout << prefix << x << suffix << "\n";
+	}
+
     }
 }
 

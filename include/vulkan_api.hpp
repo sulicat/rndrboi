@@ -18,7 +18,10 @@ namespace rndrboi
 	void init_default();
 	void setup_debug_cb();
 	void update_physical_devices();
+	void choose_device_auto();
+	bool check_queue_families( VkPhysicalDevice dev );
 	void cleanup();
+
 	static VulkanAPI* Instance();
 
     private:
@@ -32,11 +35,6 @@ namespace rndrboi
 	const std::vector<const char*> added_extensions = {
 	    VK_EXT_DEBUG_UTILS_EXTENSION_NAME
 	};
-
-	static VKAPI_ATTR VkBool32 VKAPI_CALL debug_cb( VkDebugUtilsMessageSeverityFlagBitsEXT message_severity,
-							VkDebugUtilsMessageTypeFlagsEXT message_type,
-							const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
-							void* pUserData);
 
 	//--------------------------------------------------------------------------------
 
@@ -56,6 +54,8 @@ namespace rndrboi
 	std::vector<VkLayerProperties> supported_layers;
 	std::vector<const char*> extensions;
 	VkDebugUtilsMessengerEXT debug_messenger;
+	VkPhysicalDevice selected_device = VK_NULL_HANDLE;
+	std::vector<VkPhysicalDevice> devices;
 
 	static VulkanAPI* singleton_instance;
 
