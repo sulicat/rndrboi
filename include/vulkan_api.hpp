@@ -30,6 +30,7 @@ namespace rndrboi
         VkPhysicalDevice choose_device_auto();
 	void create_surface();
 	bool check_queue_families( VkPhysicalDevice dev );
+	bool check_dev_extensions( VkPhysicalDevice dev );
 	void create_logical_device( VkPhysicalDevice dev );
 	void cleanup();
 	QueFamilyInfo que_family_info( VkPhysicalDevice dev );
@@ -46,6 +47,10 @@ namespace rndrboi
 
 	const std::vector<const char*> added_extensions = {
 	    VK_EXT_DEBUG_UTILS_EXTENSION_NAME
+	};
+
+	const std::vector<const char*> device_extensions = {
+	    VK_KHR_SWAPCHAIN_EXTENSION_NAME
 	};
 
 	//--------------------------------------------------------------------------------

@@ -58,9 +58,7 @@ void VulkanAPI::create_logical_device( VkPhysicalDevice dev )
 	break; // only 1 queue of every family type ;)
     }
 
-
     std::vector<VkDeviceQueueCreateInfo> queue_create_infos;
-
     for( auto index : unique_que_index )
     {
 	VkDeviceQueueCreateInfo queue_create_info{};
@@ -79,6 +77,8 @@ void VulkanAPI::create_logical_device( VkPhysicalDevice dev )
     create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     create_info.pQueueCreateInfos = queue_create_infos.data();
     create_info.queueCreateInfoCount = queue_create_infos.size();
+    create_info.enabledExtensionCount = device_extensions.size();
+    create_info.ppEnabledExtensionNames = device_extensions.data();
 
     VkResult res = vkCreateDevice(dev, &create_info, nullptr, &device);
 
@@ -86,6 +86,36 @@ void VulkanAPI::create_logical_device( VkPhysicalDevice dev )
 	std::cout << A_YELLOW << "[VAPI] " << A_RESET << "Logical Device Created\n";
     else
 	std::cout << A_RED << "[VAPI] " << A_RESET << "Logical Device Failed to create\n";
+}
+
+bool VulkanAPI::check_dev_extensions( VkPhysicalDevice dev )
+{
+    uint32_t extension_count;
+    vkEnumerateDeviceExtensionProperties(dev, nullptr, &extension_count, nullptr);
+    std::vector<VkExtensionProperties> physical_device_ext( extension_count );
+    vkEnumerateDeviceExtensionProperties(dev, nullptr, &extension_count, physical_device_ext.data());
+
+
+    for( auto wanted_ext : device_extensions )
+    {
+	bool found = false;
+	for( auto ext : physical_device_ext )
+	{
+	    if( std::string(ext.extensionName) == wanted_ext )
+	    {
+		found = true;
+		break;
+	    }
+	}
+
+	if( found == false )
+	{
+	    std::cout << A_RED << "[VAPI] " << A_RESET << "Could not find dev ext: " << wanted_ext << " for " << dev << " \n";
+	    return false;
+	}
+    }
+
+    return true;
 }
 
 void VulkanAPI::create_surface()
@@ -131,10 +161,12 @@ VkPhysicalDevice VulkanAPI::choose_device_auto()
 	if( props.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU )
 	{
 	    bool queue_family_status = check_queue_families( dev );
+	    bool device_extension_supp = check_dev_extensions( dev );
 
 	    std::cout << A_YELLOW << "[VAPI] " << A_RESET << "     " << "Discrete GPU found\n";
 	    std::cout << A_YELLOW << "[VAPI] " << A_RESET << "     " << "Vulkan version supported: " << props.apiVersion << "\n";
 	    std::cout << A_YELLOW << "[VAPI] " << A_RESET << "     " << "Queue families check: " << queue_family_status << "\n";
+	    std::cout << A_YELLOW << "[VAPI] " << A_RESET << "     " << "Extension support check: " << device_extension_supp << "\n";
 	    std::cout << A_YELLOW << "[VAPI] " << A_RESET << "     " << A_GREEN << "CHOSEN" << A_RESET << "\n";
 	    return dev;
 	}
