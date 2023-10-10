@@ -13,14 +13,23 @@ namespace rndrboi
     {
     public:
 
+	struct QueFamilyInfo
+	{
+	    std::vector<int> graphics_family_indices;
+	    bool supports_graphics;
+	};
+
+
 	//--------------------------------------------------------------------------------
 
 	void init_default();
 	void setup_debug_cb();
-	void update_physical_devices();
-	void choose_device_auto();
+	void update_physical_device_list();
+        VkPhysicalDevice choose_device_auto();
 	bool check_queue_families( VkPhysicalDevice dev );
+	void create_logical_device( VkPhysicalDevice dev );
 	void cleanup();
+	QueFamilyInfo que_family_info( VkPhysicalDevice dev );
 
 	static VulkanAPI* Instance();
 
@@ -54,8 +63,12 @@ namespace rndrboi
 	std::vector<VkLayerProperties> supported_layers;
 	std::vector<const char*> extensions;
 	VkDebugUtilsMessengerEXT debug_messenger;
-	VkPhysicalDevice selected_device = VK_NULL_HANDLE;
 	std::vector<VkPhysicalDevice> devices;
+
+	VkPhysicalDevice selected_physical_device = VK_NULL_HANDLE;
+
+	VkDevice device;
+	VkQueue device_graphics_queue;
 
 	static VulkanAPI* singleton_instance;
 

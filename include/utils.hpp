@@ -56,6 +56,19 @@ namespace rndrboi
 		std::cout << prefix << x << suffix << "\n";
 	}
 
+
+	template <typename T>
+	void print_iter( T in, std::string prefix = "", std::string suffix = "" )
+	{
+	    std::cout << prefix << "{ ";
+	    for( auto x : in )
+	    {
+		std::cout << x << " ";
+	    }
+
+	    std::cout << "}\n" << suffix;
+	}
+
     }
 }
 

@@ -22,11 +22,12 @@ void VulkanAPI::init_default()
 
     create_vk_instance();
     setup_debug_cb();
-    update_physical_devices();
-    choose_device_auto();
+    selected_physical_device = choose_device_auto();
+    create_logical_device( selected_physical_device );
+
 }
 
-void VulkanAPI::update_physical_devices()
+void VulkanAPI::update_physical_device_list()
 {
     uint32_t device_count = 0;
     vkEnumeratePhysicalDevices(instance, &device_count, nullptr);
@@ -34,8 +35,36 @@ void VulkanAPI::update_physical_devices()
     vkEnumeratePhysicalDevices(instance, &device_count, devices.data());
 }
 
-void VulkanAPI::choose_device_auto()
+void VulkanAPI::create_logical_device( VkPhysicalDevice dev )
 {
+    QueFamilyInfo selected_q_fam = que_family_info( dev );
+    float q_prio = 1.0f;
+
+    VkDeviceQueueCreateInfo queue_create_info{};
+    queue_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+    queue_create_info.queueFamilyIndex = selected_q_fam.graphics_family_indices[0];
+    queue_create_info.queueCount = 1;
+    queue_create_info.pQueuePriorities = &q_prio;
+
+    VkPhysicalDeviceFeatures device_features{};
+
+    VkDeviceCreateInfo create_info{};
+    create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    create_info.pQueueCreateInfos = &queue_create_info;
+    create_info.queueCreateInfoCount = 1;
+
+    VkResult res = vkCreateDevice(dev, &create_info, nullptr, &device);
+
+    if( res == VK_SUCCESS )
+	std::cout << A_YELLOW << "[VAPI] " << A_RESET << "Logical Device Created\n";
+    else
+	std::cout << A_RED << "[VAPI] " << A_RESET << "Logical Device Failed to create\n";
+}
+
+VkPhysicalDevice VulkanAPI::choose_device_auto()
+{
+    update_physical_device_list();
+
     std::cout << A_YELLOW << "[VAPI] " << A_RESET << "Choosing Device:\n";
 
     for( auto dev : devices )
@@ -47,7 +76,7 @@ void VulkanAPI::choose_device_auto()
 
 	std::cout << A_YELLOW << "[VAPI] " << A_RESET << " -> " << props.deviceName << "\n";
 
-
+	// for now pick the first discrete GPU. We can optimize later
 	if( props.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU )
 	{
 	    bool queue_family_status = check_queue_families( dev );
@@ -56,14 +85,37 @@ void VulkanAPI::choose_device_auto()
 	    std::cout << A_YELLOW << "[VAPI] " << A_RESET << "     " << "Vulkan version supported: " << props.apiVersion << "\n";
 	    std::cout << A_YELLOW << "[VAPI] " << A_RESET << "     " << "Queue families check: " << queue_family_status << "\n";
 	    std::cout << A_YELLOW << "[VAPI] " << A_RESET << "     " << A_GREEN << "CHOSEN" << A_RESET << "\n";
-	    selected_device = dev;
+	    return dev;
 	}
     }
+
+    return VK_NULL_HANDLE;
 }
+
+VulkanAPI::QueFamilyInfo VulkanAPI::que_family_info( VkPhysicalDevice dev )
+{
+    QueFamilyInfo out;
+
+    uint32_t q_fam_count = 0;
+    vkGetPhysicalDeviceQueueFamilyProperties(dev, &q_fam_count, nullptr);
+    std::vector<VkQueueFamilyProperties> q_fams(q_fam_count);
+    vkGetPhysicalDeviceQueueFamilyProperties(dev, &q_fam_count, q_fams.data());
+
+    for( int i = 0; i < q_fams.size(); i++ )
+    {
+	auto q = q_fams[i];
+	if ( q.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+	    out.graphics_family_indices.push_back(i);
+    }
+
+    out.supports_graphics = out.graphics_family_indices.size() > 0;
+
+    return out;
+}
+
 
 bool VulkanAPI::check_queue_families( VkPhysicalDevice dev )
 {
-
     uint32_t q_fam_count = 0;
     vkGetPhysicalDeviceQueueFamilyProperties(dev, &q_fam_count, nullptr);
     std::vector<VkQueueFamilyProperties> q_fams(q_fam_count);
@@ -71,8 +123,10 @@ bool VulkanAPI::check_queue_families( VkPhysicalDevice dev )
 
     bool found_graphics = false;
 
-    for( auto q : q_fams )
+    for( int i = 0; i < q_fams.size(); i++ )
     {
+	auto q = q_fams[i];
+
 	if ( q.queueFlags & VK_QUEUE_GRAPHICS_BIT)
 	    found_graphics = true;
     }
@@ -161,6 +215,7 @@ void VulkanAPI::create_vk_instance()
 void VulkanAPI::cleanup()
 {
 
+    vkDestroyDevice(device, nullptr);
     DestroyDebugUtilsMessengerEXT( instance, debug_messenger, nullptr );
     vkDestroyInstance(instance, nullptr);
 
