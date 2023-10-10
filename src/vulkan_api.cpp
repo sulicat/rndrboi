@@ -1,6 +1,8 @@
 #include "vulkan_api.hpp"
 #include "vulkan_api_helpers.hpp"
 
+#include <set>
+
 using namespace rndrboi;
 
 VulkanAPI* VulkanAPI::singleton_instance = NULL;
@@ -22,6 +24,7 @@ void VulkanAPI::init_default()
 
     create_vk_instance();
     setup_debug_cb();
+    create_surface();
     selected_physical_device = choose_device_auto();
     create_logical_device( selected_physical_device );
 
@@ -40,18 +43,42 @@ void VulkanAPI::create_logical_device( VkPhysicalDevice dev )
     QueFamilyInfo selected_q_fam = que_family_info( dev );
     float q_prio = 1.0f;
 
-    VkDeviceQueueCreateInfo queue_create_info{};
-    queue_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-    queue_create_info.queueFamilyIndex = selected_q_fam.graphics_family_indices[0];
-    queue_create_info.queueCount = 1;
-    queue_create_info.pQueuePriorities = &q_prio;
+    std::set<uint32_t> unique_que_index;
+    for( auto i : selected_q_fam.graphics_family_indices )
+    {
+	unique_que_index.insert( i );
+	std::cout << A_YELLOW << "[VAPI] " << A_RESET << "Graphics queue index: " << i << "\n";
+	break; // only 1 queue of every family type ;)
+    }
+
+    for( auto i : selected_q_fam.present_family_indices )
+    {
+	unique_que_index.insert( i );
+	std::cout << A_YELLOW << "[VAPI] " << A_RESET << "Present queue index: " << i << "\n";
+	break; // only 1 queue of every family type ;)
+    }
+
+
+    std::vector<VkDeviceQueueCreateInfo> queue_create_infos;
+
+    for( auto index : unique_que_index )
+    {
+	VkDeviceQueueCreateInfo queue_create_info{};
+	queue_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+	queue_create_info.queueFamilyIndex = index;
+	queue_create_info.queueCount = 1;
+	queue_create_info.pQueuePriorities = &q_prio;
+	queue_create_infos.push_back( queue_create_info );
+
+	std::cout << A_YELLOW << "[VAPI] " << A_RESET << "Creating queue index: " << index << "\n";
+    }
 
     VkPhysicalDeviceFeatures device_features{};
 
     VkDeviceCreateInfo create_info{};
     create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-    create_info.pQueueCreateInfos = &queue_create_info;
-    create_info.queueCreateInfoCount = 1;
+    create_info.pQueueCreateInfos = queue_create_infos.data();
+    create_info.queueCreateInfoCount = queue_create_infos.size();
 
     VkResult res = vkCreateDevice(dev, &create_info, nullptr, &device);
 
@@ -59,6 +86,30 @@ void VulkanAPI::create_logical_device( VkPhysicalDevice dev )
 	std::cout << A_YELLOW << "[VAPI] " << A_RESET << "Logical Device Created\n";
     else
 	std::cout << A_RED << "[VAPI] " << A_RESET << "Logical Device Failed to create\n";
+}
+
+void VulkanAPI::create_surface()
+{
+    if( Config::Instance()->window_manager == Config::WINDOW_MANAGER::GLFW )
+    {
+
+	rndrboi::WindowGLFW* glfw_window = dynamic_cast<rndrboi::WindowGLFW*>(Window::Instance()->get().get());
+
+	VkResult res = glfwCreateWindowSurface(instance,
+					       glfw_window->window,
+					       nullptr,
+					       &surface);
+
+	if( res == VK_SUCCESS )
+	    std::cout << A_YELLOW << "[VAPI] " << A_RESET << "Created GLFW Surface\n";
+	else
+	    std::cout << A_RED << "[VAPI] " << A_RESET << "ERROR: Unable to create GLFW Surface\n";
+
+    }
+    else
+    {
+	std::cout << A_RED << "[VAPI] " << A_RESET << "ERROR: Unable to create surface for window manager type\n";
+    }
 }
 
 VkPhysicalDevice VulkanAPI::choose_device_auto()
@@ -104,11 +155,22 @@ VulkanAPI::QueFamilyInfo VulkanAPI::que_family_info( VkPhysicalDevice dev )
     for( int i = 0; i < q_fams.size(); i++ )
     {
 	auto q = q_fams[i];
+
+	// graphicss
 	if ( q.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+	{
 	    out.graphics_family_indices.push_back(i);
+	}
+
+	// presentation
+	VkBool32 present_support = false;
+	vkGetPhysicalDeviceSurfaceSupportKHR( dev, i, surface, &present_support );
+	out.present_family_indices.push_back( i );
+
     }
 
     out.supports_graphics = out.graphics_family_indices.size() > 0;
+    out.supports_present = out.present_family_indices.size() > 0;
 
     return out;
 }
@@ -217,6 +279,7 @@ void VulkanAPI::cleanup()
 
     vkDestroyDevice(device, nullptr);
     DestroyDebugUtilsMessengerEXT( instance, debug_messenger, nullptr );
+    vkDestroySurfaceKHR(instance, surface, nullptr);
     vkDestroyInstance(instance, nullptr);
 
     std::cout << A_YELLOW << "[VAPI] " << A_RESET << "cleanup\n";

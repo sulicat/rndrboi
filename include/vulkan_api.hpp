@@ -16,7 +16,9 @@ namespace rndrboi
 	struct QueFamilyInfo
 	{
 	    std::vector<int> graphics_family_indices;
+	    std::vector<int> present_family_indices;
 	    bool supports_graphics;
+	    bool supports_present;
 	};
 
 
@@ -26,6 +28,7 @@ namespace rndrboi
 	void setup_debug_cb();
 	void update_physical_device_list();
         VkPhysicalDevice choose_device_auto();
+	void create_surface();
 	bool check_queue_families( VkPhysicalDevice dev );
 	void create_logical_device( VkPhysicalDevice dev );
 	void cleanup();
@@ -69,6 +72,8 @@ namespace rndrboi
 
 	VkDevice device;
 	VkQueue device_graphics_queue;
+	VkSurfaceKHR surface;
+
 
 	static VulkanAPI* singleton_instance;
 
