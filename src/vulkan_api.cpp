@@ -2,6 +2,8 @@
 #include "vulkan_api_helpers.hpp"
 
 #include <set>
+#include <algorithm>
+#include <limits>
 
 using namespace rndrboi;
 
@@ -18,6 +20,28 @@ VulkanAPI* VulkanAPI::Instance()
 
 //----------------------------------------------------------------------------------------------------
 
+std::ostream& operator<<(std::ostream& os, struct VulkanAPI::SwapChainSupportInfo& info)
+{
+    os << " CAP img_count { " << info.capabilities.currentExtent.width << "x" << info.capabilities.currentExtent.height << " }";
+    os << " Formats { ";
+    for( auto f : info.formats )
+	os << f.format << " ";
+    os << "}";
+
+    os << " Color Space { ";
+    for( auto f : info.formats )
+	os << f.colorSpace << " ";
+    os << "}";
+
+    os << " PRESENT MODES { ";
+    for( auto p : info.present_modes )
+	os << p << " ";
+    os << "}";
+
+    return os;
+}
+
+
 void VulkanAPI::init_default()
 {
     std::cout << A_YELLOW << "[VAPI] " << A_RESET << "init default\n";
@@ -27,7 +51,7 @@ void VulkanAPI::init_default()
     create_surface();
     selected_physical_device = choose_device_auto();
     create_logical_device( selected_physical_device );
-
+    create_swapchain( selected_physical_device );
 }
 
 void VulkanAPI::update_physical_device_list()
@@ -88,6 +112,60 @@ void VulkanAPI::create_logical_device( VkPhysicalDevice dev )
 	std::cout << A_RED << "[VAPI] " << A_RESET << "Logical Device Failed to create\n";
 }
 
+void VulkanAPI::create_swapchain( VkPhysicalDevice dev  )
+{
+    SwapChainSupportInfo swap_chain_info = get_swapchain_support_info( dev );
+    VkSurfaceFormatKHR chosen_surface_format = get_preferred_format( swap_chain_info.formats );
+    VkPresentModeKHR chosen_present_mode = get_preferred_mode( swap_chain_info.present_modes );
+    VkExtent2D chosen_extent = get_preferred_extent( swap_chain_info.capabilities );
+
+    uint32_t image_count = swap_chain_info.capabilities.minImageCount + 1;
+
+    VkSwapchainCreateInfoKHR create_info{};
+    create_info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+    create_info.surface = surface;
+    create_info.minImageCount = image_count;
+    create_info.imageFormat = chosen_surface_format.format;
+    create_info.imageColorSpace = chosen_surface_format.colorSpace;
+    create_info.imageExtent = chosen_extent;
+    create_info.imageArrayLayers = 1;
+    create_info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+
+    QueFamilyInfo q_fam_info = que_family_info( dev );
+
+    if( q_fam_info.graphics_family_indices[0] == q_fam_info.present_family_indices[0] )
+    {
+	create_info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+        create_info.queueFamilyIndexCount = 0;
+	create_info.pQueueFamilyIndices = nullptr;
+    }
+    else
+    {
+	std::cout << A_RED << "[VAPI] " << A_RESET << "ERROR Unhandled case of concurrent que fams\n";
+    }
+
+    create_info.preTransform = swap_chain_info.capabilities.currentTransform;
+    create_info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+    create_info.presentMode = chosen_present_mode;
+    create_info.clipped = VK_FALSE;
+    create_info.oldSwapchain = VK_NULL_HANDLE;
+
+    VkResult stat = vkCreateSwapchainKHR( device,
+					  &create_info,
+					  nullptr,
+					  &swap_chain );
+
+
+    if( stat == VK_SUCCESS )
+	std::cout << A_YELLOW << "[VAPI] " << A_RESET << "Created Swapchain\n";
+    else
+	std::cout << A_RED << "[VAPI] " << A_RESET << "ERROR failed to create swapchain\n";
+
+    swapchain_images = get_swapchain_images( swap_chain );
+    swapchain_image_extent = chosen_extent;
+    swapchain_image_format = chosen_surface_format.format;
+}
+
 bool VulkanAPI::check_dev_extensions( VkPhysicalDevice dev )
 {
     uint32_t extension_count;
@@ -116,6 +194,50 @@ bool VulkanAPI::check_dev_extensions( VkPhysicalDevice dev )
     }
 
     return true;
+}
+
+std::vector<VkImage> VulkanAPI::get_swapchain_images( VkSwapchainKHR sc )
+{
+    std::vector<VkImage> images;
+
+    uint32_t image_count;
+    vkGetSwapchainImagesKHR(device, sc, &image_count, nullptr);
+    images.resize(image_count);
+    vkGetSwapchainImagesKHR(device, sc, &image_count, images.data());
+
+    return std::move(images);
+}
+
+
+VulkanAPI::SwapChainSupportInfo VulkanAPI::get_swapchain_support_info( VkPhysicalDevice dev )
+{
+    SwapChainSupportInfo info;
+
+    // capabilities
+    vkGetPhysicalDeviceSurfaceCapabilitiesKHR( dev, surface, &info.capabilities);
+
+    // format
+    uint32_t format_count;
+    vkGetPhysicalDeviceSurfaceFormatsKHR( dev, surface, &format_count, nullptr );
+    if( format_count != 0 )
+    {
+	info.formats.resize( format_count );
+	vkGetPhysicalDeviceSurfaceFormatsKHR( dev, surface, &format_count, info.formats.data() );
+    }
+
+    // present mode
+    uint32_t present_mode_count;
+    vkGetPhysicalDeviceSurfacePresentModesKHR( dev, surface, &present_mode_count, nullptr );
+    if( present_mode_count != 0 )
+    {
+	info.present_modes.resize( present_mode_count );
+	vkGetPhysicalDeviceSurfacePresentModesKHR( dev, surface, &present_mode_count, info.present_modes.data() );
+
+    }
+
+
+
+    return info;
 }
 
 void VulkanAPI::create_surface()
@@ -162,17 +284,77 @@ VkPhysicalDevice VulkanAPI::choose_device_auto()
 	{
 	    bool queue_family_status = check_queue_families( dev );
 	    bool device_extension_supp = check_dev_extensions( dev );
+	    SwapChainSupportInfo swap_chain_info = get_swapchain_support_info( dev );
 
 	    std::cout << A_YELLOW << "[VAPI] " << A_RESET << "     " << "Discrete GPU found\n";
 	    std::cout << A_YELLOW << "[VAPI] " << A_RESET << "     " << "Vulkan version supported: " << props.apiVersion << "\n";
 	    std::cout << A_YELLOW << "[VAPI] " << A_RESET << "     " << "Queue families check: " << queue_family_status << "\n";
 	    std::cout << A_YELLOW << "[VAPI] " << A_RESET << "     " << "Extension support check: " << device_extension_supp << "\n";
+	    std::cout << A_YELLOW << "[VAPI] " << A_RESET << "     " << "SwapChainInfo: " << swap_chain_info << "\n";
 	    std::cout << A_YELLOW << "[VAPI] " << A_RESET << "     " << A_GREEN << "CHOSEN" << A_RESET << "\n";
 	    return dev;
 	}
     }
 
     return VK_NULL_HANDLE;
+}
+
+VkSurfaceFormatKHR VulkanAPI::get_preferred_format( std::vector<VkSurfaceFormatKHR> format_in )
+{
+    for( auto f : format_in )
+    {
+	if( f.format == VK_FORMAT_B8G8R8A8_SRGB && f.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR )
+	{
+	    return f;
+	}
+    }
+    return format_in[0];
+}
+
+VkPresentModeKHR VulkanAPI::get_preferred_mode( std::vector<VkPresentModeKHR> present_modes_in )
+{
+    for( auto pm : present_modes_in )
+    {
+	if( pm == VK_PRESENT_MODE_MAILBOX_KHR )
+	{
+	    std::cout << "IDEAL PRESENT MODE";
+	    return pm;
+	}
+    }
+
+    return VK_PRESENT_MODE_FIFO_KHR;
+}
+
+VkExtent2D VulkanAPI::get_preferred_extent( VkSurfaceCapabilitiesKHR capabilities )
+{
+
+    if( Config::Instance()->window_manager == Config::WINDOW_MANAGER::GLFW )
+    {
+	if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max())
+	{
+	    return capabilities.currentExtent;
+	}
+	else
+	{
+
+	    rndrboi::WindowGLFW* glfw_window = dynamic_cast<rndrboi::WindowGLFW*>(Window::Instance()->get().get());
+
+	    int width, height;
+	    glfwGetFramebufferSize(glfw_window->window, &width, &height);
+
+	    VkExtent2D actualExtent = {
+		static_cast<uint32_t>(width),
+		static_cast<uint32_t>(height)
+	    };
+
+	    actualExtent.width = std::clamp(actualExtent.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
+	    actualExtent.height = std::clamp(actualExtent.height, capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
+	    return actualExtent;
+	}
+    }
+
+    return capabilities.currentExtent;
+
 }
 
 VulkanAPI::QueFamilyInfo VulkanAPI::que_family_info( VkPhysicalDevice dev )
@@ -309,6 +491,7 @@ void VulkanAPI::create_vk_instance()
 void VulkanAPI::cleanup()
 {
 
+    vkDestroySwapchainKHR(device, swap_chain, nullptr);
     vkDestroyDevice(device, nullptr);
     DestroyDebugUtilsMessengerEXT( instance, debug_messenger, nullptr );
     vkDestroySurfaceKHR(instance, surface, nullptr);

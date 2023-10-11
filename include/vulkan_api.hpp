@@ -6,6 +6,10 @@
 #include "config.hpp"
 #include <vulkan/vulkan.h>
 
+
+std::ostream& operator<<(std::ostream&, struct SwapChainSupportInfo&);
+
+
 namespace rndrboi
 {
 
@@ -21,6 +25,13 @@ namespace rndrboi
 	    bool supports_present;
 	};
 
+	struct SwapChainSupportInfo
+	{
+	    VkSurfaceCapabilitiesKHR capabilities;
+	    std::vector<VkSurfaceFormatKHR> formats;
+	    std::vector<VkPresentModeKHR> present_modes;
+	};
+
 
 	//--------------------------------------------------------------------------------
 
@@ -32,8 +43,18 @@ namespace rndrboi
 	bool check_queue_families( VkPhysicalDevice dev );
 	bool check_dev_extensions( VkPhysicalDevice dev );
 	void create_logical_device( VkPhysicalDevice dev );
-	void cleanup();
 	QueFamilyInfo que_family_info( VkPhysicalDevice dev );
+
+	// swap chain
+	SwapChainSupportInfo get_swapchain_support_info( VkPhysicalDevice dev );
+        VkSurfaceFormatKHR get_preferred_format( std::vector<VkSurfaceFormatKHR> format_in );
+        VkPresentModeKHR get_preferred_mode( std::vector<VkPresentModeKHR> present_mode_in );
+        VkExtent2D get_preferred_extent( VkSurfaceCapabilitiesKHR capabilities );
+	void create_swapchain( VkPhysicalDevice dev );
+	std::vector<VkImage> get_swapchain_images( VkSwapchainKHR sc );
+
+	void cleanup();
+
 
 	static VulkanAPI* Instance();
 
@@ -79,6 +100,10 @@ namespace rndrboi
 	VkQueue device_graphics_queue;
 	VkSurfaceKHR surface;
 
+	VkSwapchainKHR swap_chain;
+	std::vector<VkImage> swapchain_images;
+	VkExtent2D swapchain_image_extent;
+        VkFormat swapchain_image_format;
 
 	static VulkanAPI* singleton_instance;
 
