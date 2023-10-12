@@ -52,6 +52,7 @@ namespace rndrboi
         VkExtent2D get_preferred_extent( VkSurfaceCapabilitiesKHR capabilities );
 	void create_swapchain( VkPhysicalDevice dev );
 	std::vector<VkImage> get_swapchain_images( VkSwapchainKHR sc );
+	void create_image_views();
 
 	void cleanup();
 
@@ -102,6 +103,7 @@ namespace rndrboi
 
 	VkSwapchainKHR swap_chain;
 	std::vector<VkImage> swapchain_images;
+	std::vector<VkImageView> swapchain_image_views;
 	VkExtent2D swapchain_image_extent;
         VkFormat swapchain_image_format;
 

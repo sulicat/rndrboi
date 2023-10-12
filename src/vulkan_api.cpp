@@ -51,7 +51,9 @@ void VulkanAPI::init_default()
     create_surface();
     selected_physical_device = choose_device_auto();
     create_logical_device( selected_physical_device );
+
     create_swapchain( selected_physical_device );
+    create_image_views();
 }
 
 void VulkanAPI::update_physical_device_list()
@@ -164,6 +166,39 @@ void VulkanAPI::create_swapchain( VkPhysicalDevice dev  )
     swapchain_images = get_swapchain_images( swap_chain );
     swapchain_image_extent = chosen_extent;
     swapchain_image_format = chosen_surface_format.format;
+}
+
+void VulkanAPI::create_image_views()
+{
+    swapchain_image_views.resize( swapchain_images.size() );
+
+    for( int i = 0; i < swapchain_images.size(); i++ )
+    {
+	VkImageViewCreateInfo create_info{};
+	create_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+	create_info.image = swapchain_images[i];
+	create_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
+	create_info.format = swapchain_image_format;
+
+        create_info.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+	create_info.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+	create_info.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+        create_info.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+
+	create_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	create_info.subresourceRange.baseMipLevel = 0;
+	create_info.subresourceRange.levelCount = 1;
+	create_info.subresourceRange.baseArrayLayer = 0;
+	create_info.subresourceRange.layerCount = 1;
+
+	VkResult res = vkCreateImageView( device, &create_info, nullptr, &swapchain_image_views[i]);
+
+	if( res == VK_SUCCESS )
+	    std::cout << A_YELLOW << "[VAPI] " << A_RESET << "Created image view: " << i << "\n";
+	else
+	    std::cout << A_RED << "[VAPI] " << A_RESET << "ERROR failed to create image view" << i << "\n";
+
+    }
 }
 
 bool VulkanAPI::check_dev_extensions( VkPhysicalDevice dev )
@@ -490,6 +525,9 @@ void VulkanAPI::create_vk_instance()
 
 void VulkanAPI::cleanup()
 {
+
+    for( auto im : swapchain_image_views )
+	vkDestroyImageView( device, im, nullptr );
 
     vkDestroySwapchainKHR(device, swap_chain, nullptr);
     vkDestroyDevice(device, nullptr);
