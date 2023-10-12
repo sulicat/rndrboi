@@ -8,6 +8,7 @@ Window* Window::instance = NULL;
 
 Window* Window::Instance(){
     if (!instance){
+	std::cout << A_YELLOW << "[WINDOW] " << A_RESET << "GLFW WINDOW\n";
 	instance = new Window;
 	instance->platform_window = std::shared_ptr<WindowBase>(new WindowGLFW);
     }
@@ -16,7 +17,6 @@ Window* Window::Instance(){
 
 std::shared_ptr<WindowBase> Window::get()
 {
-    std::cout << A_YELLOW << "[WINDOW] " << A_RESET << "GLFW WINDOW\n";
     return platform_window;
 }
 
