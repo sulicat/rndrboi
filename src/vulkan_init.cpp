@@ -2,7 +2,6 @@
 #include "vulkan_api_helpers.hpp"
 #include <set>
 
-
 #define OK_PRINT (A_YELLOW "[VULKAN INIT] " A_RESET)
 #define BAD_PRINT (A_RED "[VULKAN INIT] " A_RESET)
 
@@ -361,6 +360,8 @@ void VulkanDeviceInit::create_logical_device( VulkanDevice& dev, const VulkanDev
     create_info.enabledExtensionCount = device_extensions.size();
     create_info.ppEnabledExtensionNames = device_extensions.data();
 
+
+    dev.queue_fam_info = selected_q_fam;
     VkResult res = vkCreateDevice(dev.physical_device, &create_info, nullptr, &dev.logical_device);
 
     if( res == VK_SUCCESS )
