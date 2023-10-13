@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <memory>
+#include <fstream>
 
 #define A_RESET "\033[0m"
 #define A_FG(R,G,B) "\033[38;2;" #R ";" #G ";" #B "m"
@@ -68,6 +69,8 @@ namespace rndrboi
 
 	    std::cout << "}\n" << suffix;
 	}
+
+	std::vector<char> read_file(const std::string& filename);
 
     }
 }

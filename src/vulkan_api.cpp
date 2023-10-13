@@ -5,10 +5,8 @@
 #include <algorithm>
 #include <limits>
 
-
 #define OK_PRINT (A_YELLOW "[VULKAN API] " A_RESET)
 #define BAD_PRINT (A_RED "[VULKAN API] " A_RESET)
-
 
 using namespace rndrboi;
 
@@ -36,12 +34,19 @@ void VulkanAPI::init_default()
 
     device_data = VulkanDeviceInit::init( dev_preferences );
     swapchain.create( device_data );
-
     std::cout << OK_PRINT << swapchain << "\n";
+
+    pipeline.create( device_data,
+		     {
+			 .vert_shader_path = "./compiled_shaders/shader.vert.spv",
+			 .frag_shader_path = "./compiled_shaders/shader.frag.spv"
+		     });
+
 }
 
 void VulkanAPI::cleanup()
 {
+    pipeline.clean();
     swapchain.clean();
     VulkanDeviceInit::clean( device_data );
 }

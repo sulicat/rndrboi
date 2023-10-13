@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <string>
+#include <optional>
 #include <vulkan/vulkan.h>
 
 namespace rndrboi
@@ -53,6 +54,21 @@ namespace rndrboi
 	std::string engine_name		= "rndrboi";
 	int app_ver[3]			= {0,0,1};
 	int engine_ver[3]		= {0,0,1};
+    };
+
+
+    struct GraphicsPipelineSettings
+    {
+	std::string vert_shader_path;
+	std::string frag_shader_path;
+	std::string vert_entrypoint = "main";
+	std::string frag_entrypoint = "main";
+
+	// add constants for every stage
+	// look at pSpecializationInfo here: https://registry.khronos.org/vulkan/specs/1.3-extensions/man/html/VkPipelineShaderStageCreateInfo.html
+
+	std::optional<std::string> tesselation_shader_path;
+	std::optional<std::string> geometry_shader_path;
     };
 
 };
