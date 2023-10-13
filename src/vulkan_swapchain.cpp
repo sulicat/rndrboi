@@ -19,6 +19,7 @@ std::ostream& rndrboi::operator<<(std::ostream& os, Swapchain& chain)
     os << "Swapchain: " << chain.width() << "x" << chain.height() << "  "
        << "Size: " << chain.size() << " "
        << "Format: " << chain.image_format << " "
+       << "PresentMode: " << chain.present_mode << " "
        << "complete: " << chain.complete << "\n";
     return os;
 }
@@ -85,14 +86,18 @@ void Swapchain::create( VulkanDevice& dev )
 					  nullptr,
 					  &swapchain );
 
-    if( stat == VK_SUCCESS )
-	std::cout << OK_PRINT << "Created Swapchain\n";
-    else
-	std::cout << BAD_PRINT << "ERROR failed to create swapchain\n";
+    if( debug_print )
+    {
+	if( stat == VK_SUCCESS )
+	    std::cout << OK_PRINT << "Created Swapchain\n";
+	else
+	    std::cout << BAD_PRINT << "ERROR failed to create swapchain\n";
+    }
 
     images = get_swapchain_images( dev, swapchain );
     image_extent = chosen_extent;
     image_format = chosen_surface_format.format;
+    present_mode = chosen_present_mode;
 
     create_image_views( dev );
 
@@ -108,7 +113,8 @@ void Swapchain::clean()
 
     vkDestroySwapchainKHR(dev_internal->logical_device, swapchain, nullptr);
 
-    std::cout << OK_PRINT << "Cleaned swapchain\n";
+    if( debug_print )
+	std::cout << OK_PRINT << "Cleaned swapchain\n";
 }
 
 std::vector<VkImage> Swapchain::get_swapchain_images( VulkanDevice& dev, VkSwapchainKHR sc )
@@ -140,7 +146,8 @@ VkPresentModeKHR Swapchain::get_preferred_mode( std::vector<VkPresentModeKHR> pr
     {
 	if( pm == VK_PRESENT_MODE_MAILBOX_KHR )
 	{
-	    std::cout << "IDEAL PRESENT MODE";
+	    if( debug_print )
+		std::cout << "IDEAL PRESENT MODE";
 	    return pm;
 	}
     }
@@ -206,10 +213,12 @@ void Swapchain::create_image_views( VulkanDevice& dev )
 
 	VkResult res = vkCreateImageView( dev.logical_device, &create_info, nullptr, &image_views[i]);
 
-	if( res == VK_SUCCESS )
-	    std::cout << OK_PRINT << "Created image view: " << i << "\n";
-	else
-	    std::cout << BAD_PRINT << "ERROR failed to create image view" << i << "\n";
-
+	if( debug_print )
+	{
+	    if( res == VK_SUCCESS )
+		std::cout << OK_PRINT << "Created image view: " << i << "\n";
+	    else
+		std::cout << BAD_PRINT << "ERROR failed to create image view" << i << "\n";
+	}
     }
 }

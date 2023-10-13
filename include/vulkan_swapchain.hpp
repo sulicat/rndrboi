@@ -23,7 +23,9 @@ namespace rndrboi
 	std::vector<VkImageView>	 image_views;
 	VkExtent2D			 image_extent;
 	VkFormat			 image_format;
+	VkPresentModeKHR		 present_mode;
 	bool				 complete = false;
+	bool				 debug_print = false;
 
     private:
 	VkSurfaceFormatKHR	 get_preferred_format( std::vector<VkSurfaceFormatKHR> format_in );

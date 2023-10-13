@@ -41,6 +41,10 @@ ${OBJ_DIR}/%.o: ${SRC_DIR}/%.cpp
 rndrboi_shared: lib_dir ${OBJ}
 	@echo "-------------------- RNDRBOI SHARED"
 	${CXX} ${FLAGS} --shared ${OBJ} -o ${LIB_PATH}/shared/lib${LIB_NAME}.so
+
+	@echo "\n"
+	@echo "-------------------- RNDRBOI SHARED - Compiling Shaders"
+	./compile_shaders.sh shaders/ compiled_shaders/
 	@echo "\n"
 
 apps:

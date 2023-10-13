@@ -5,6 +5,11 @@
 #include <algorithm>
 #include <limits>
 
+
+#define OK_PRINT (A_YELLOW "[VULKAN API] " A_RESET)
+#define BAD_PRINT (A_RED "[VULKAN API] " A_RESET)
+
+
 using namespace rndrboi;
 
 VulkanAPI* VulkanAPI::singleton_instance = NULL;
@@ -22,8 +27,6 @@ VulkanAPI* VulkanAPI::Instance()
 
 void VulkanAPI::init_default()
 {
-    std::cout << A_YELLOW << "[VAPI] " << A_RESET << "init default\n";
-
     rndrboi::VulkanDevicePreferences dev_preferences{};
     dev_preferences.graphics		= true;
     dev_preferences.present		= true;
@@ -34,12 +37,11 @@ void VulkanAPI::init_default()
     device_data = VulkanDeviceInit::init( dev_preferences );
     swapchain.create( device_data );
 
-    std::cout << swapchain << "\n";
+    std::cout << OK_PRINT << swapchain << "\n";
 }
 
 void VulkanAPI::cleanup()
 {
-
     swapchain.clean();
     VulkanDeviceInit::clean( device_data );
 }
