@@ -57,12 +57,25 @@ namespace rndrboi
     };
 
 
+    enum BLEND_TYPE
+    {
+	OFF,
+	ALPHA_BLEND
+    };
+
     struct GraphicsPipelineSettings
     {
 	std::string vert_shader_path;
 	std::string frag_shader_path;
 	std::string vert_entrypoint = "main";
 	std::string frag_entrypoint = "main";
+        float viewport_width = 1920;
+	float viewport_height = 1080;
+
+	VkPolygonMode polygon_mode	= VK_POLYGON_MODE_FILL;
+	VkCullModeFlagBits cull_mode	= VK_CULL_MODE_BACK_BIT;
+	VkFrontFace front_face		= VK_FRONT_FACE_CLOCKWISE;
+	BLEND_TYPE blend_type		= ALPHA_BLEND;
 
 	// add constants for every stage
 	// look at pSpecializationInfo here: https://registry.khronos.org/vulkan/specs/1.3-extensions/man/html/VkPipelineShaderStageCreateInfo.html
@@ -71,4 +84,8 @@ namespace rndrboi
 	std::optional<std::string> geometry_shader_path;
     };
 
+    struct RenderPassSettings
+    {
+	VkFormat format;
+    };
 };

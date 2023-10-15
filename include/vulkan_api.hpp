@@ -8,9 +8,8 @@
 #include "vulkan_init.hpp"
 #include "vulkan_swapchain.hpp"
 #include "vulkan_graphics_pipeline.hpp"
+#include "vulkan_render_pass.hpp"
 #include <vulkan/vulkan.h>
-
-
 
 namespace rndrboi
 {
@@ -31,6 +30,7 @@ namespace rndrboi
 
 	rndrboi::VulkanDevice device_data;
 	rndrboi::Swapchain swapchain;
+	rndrboi::RenderPass render_pass;
 	rndrboi::GraphicsPipeline pipeline;
 
 	static VulkanAPI* singleton_instance;

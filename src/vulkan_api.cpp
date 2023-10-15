@@ -33,19 +33,33 @@ void VulkanAPI::init_default()
     dev_preferences.print_info		= true;
 
     device_data = VulkanDeviceInit::init( dev_preferences );
-    swapchain.create( device_data );
-    std::cout << OK_PRINT << swapchain << "\n";
 
+    swapchain.create( device_data );
+
+    // render passes
+    render_pass.create( device_data,
+			{
+			    .format = swapchain.image_format
+			});
+
+    // pipelines
     pipeline.create( device_data,
+		     render_pass,
 		     {
-			 .vert_shader_path = "./compiled_shaders/shader.vert.spv",
-			 .frag_shader_path = "./compiled_shaders/shader.frag.spv"
+			 .vert_shader_path	= "./compiled_shaders/shader.vert.spv",
+			 .frag_shader_path	= "./compiled_shaders/shader.frag.spv",
+			 .viewport_width	= (float)swapchain.width(),
+			 .viewport_height	= (float)swapchain.height(),
+			 .blend_type		= OFF
 		     });
+
+
 
 }
 
 void VulkanAPI::cleanup()
 {
+    render_pass.clean();
     pipeline.clean();
     swapchain.clean();
     VulkanDeviceInit::clean( device_data );

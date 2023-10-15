@@ -15,7 +15,7 @@ LIBS 	=	-l vulkan \
 SRC_DIR		= src
 SRC		= $(wildcard ${SRC_DIR}/*.cpp)
 
-FLAGS		= -std=c++17 -O2 -fPIC
+FLAGS		= -std=c++20 -O2 -fPIC
 MAKE_CMD	= make -j -C
 MKDIR_CMD	= mkdir -p
 CXX		= g++
