@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <vector>
 #include "vulkan_render_pass.hpp"
 #include "vulkan_types.hpp"
@@ -16,18 +15,17 @@ namespace rndrboi
 	VkShaderModule create_shader_module( VulkanDevice& dev, std::vector<char>& code );
 	void clean();
 
-	std::vector<char> vert_shader;
-	std::vector<char> frag_shader;
-	VkShaderModule vert_module;
-	VkShaderModule frag_module;
-	VkViewport viewport;
-	VkRect2D scissor;
-	VkPipelineLayout pipeline_layout;
+	std::vector<char>	 vert_shader;
+	std::vector<char>	 frag_shader;
+	VkShaderModule		 vert_module;
+	VkShaderModule		 frag_module;
+	VkViewport		 viewport;
+	VkRect2D		 scissor;
+	VkPipelineLayout	 pipeline_layout;
 
     private:
 	VulkanDevice* dev_internal;
 	GraphicsPipelineSettings settings;
-	VkPipeline pipeline;
 
 	const std::vector<VkDynamicState> dynamic_states = {
 	    VK_DYNAMIC_STATE_VIEWPORT,

@@ -53,12 +53,21 @@ void VulkanAPI::init_default()
 			 .blend_type		= OFF
 		     });
 
+    framebuffer.create( device_data, swapchain, render_pass );
 
+    command_manager.create( device_data, {} );
 
+    command_manager.begin_recording();
+    command_manager.begin_render_pass( render_pass, swapchain, framebuffer, 0 );
+    command_manager.draw( pipeline, swapchain, 3 );
+    command_manager.end_render_pass();
+    command_manager.end_recording();
 }
 
 void VulkanAPI::cleanup()
 {
+    command_manager.clean();
+    framebuffer.clean();
     render_pass.clean();
     pipeline.clean();
     swapchain.clean();

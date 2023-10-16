@@ -9,17 +9,17 @@ namespace rndrboi
 {
     struct SwapChainSupportInfo
     {
-	VkSurfaceCapabilitiesKHR capabilities;
-	std::vector<VkSurfaceFormatKHR> formats;
-	std::vector<VkPresentModeKHR> present_modes;
+	VkSurfaceCapabilitiesKHR	 capabilities;
+	std::vector<VkSurfaceFormatKHR>	 formats;
+	std::vector<VkPresentModeKHR>	 present_modes;
     };
 
     struct QueFamilyInfo
     {
-	std::vector<int> graphics_family_indices;
-	std::vector<int> present_family_indices;
-	bool supports_graphics;
-	bool supports_present;
+	std::vector<int>	 graphics_family_indices;
+	std::vector<int>	 present_family_indices;
+	bool			 supports_graphics;
+	bool			 supports_present;
     };
 
     struct VulkanDevice
@@ -27,10 +27,6 @@ namespace rndrboi
 	VkInstance			 instance;
 	VkPhysicalDevice		 physical_device	= VK_NULL_HANDLE;
 	VkDevice			 logical_device		= VK_NULL_HANDLE;
-	std::vector<int>		 graphics_family_indices;
-	std::vector<int>		 present_family_indices;
-	bool				 supports_graphics;
-	bool				 supports_present;
 	std::vector<const char*>         extensions;
 	std::vector<const char*>         validation_layers;
 	VkSurfaceKHR			 surface = NULL;
@@ -69,7 +65,7 @@ namespace rndrboi
 	std::string frag_shader_path;
 	std::string vert_entrypoint = "main";
 	std::string frag_entrypoint = "main";
-        float viewport_width = 1920;
+	float viewport_width = 1920;
 	float viewport_height = 1080;
 
 	VkPolygonMode polygon_mode	= VK_POLYGON_MODE_FILL;
@@ -88,4 +84,10 @@ namespace rndrboi
     {
 	VkFormat format;
     };
+
+    struct CommandManagerSettings
+    {
+	int num_command_buffers = 1;
+    };
+
 };

@@ -9,6 +9,8 @@
 #include "vulkan_swapchain.hpp"
 #include "vulkan_graphics_pipeline.hpp"
 #include "vulkan_render_pass.hpp"
+#include "vulkan_framebuffer.hpp"
+#include "vulkan_command_manager.hpp"
 #include <vulkan/vulkan.h>
 
 namespace rndrboi
@@ -32,6 +34,8 @@ namespace rndrboi
 	rndrboi::Swapchain swapchain;
 	rndrboi::RenderPass render_pass;
 	rndrboi::GraphicsPipeline pipeline;
+	rndrboi::Framebuffer framebuffer;
+	rndrboi::CommandManager command_manager;
 
 	static VulkanAPI* singleton_instance;
 
