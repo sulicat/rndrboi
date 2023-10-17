@@ -10,6 +10,7 @@
 #include "vulkan_wrappers/vulkan_render_pass.hpp"
 #include "vulkan_wrappers/vulkan_framebuffer.hpp"
 #include "vulkan_wrappers/vulkan_command_manager.hpp"
+#include "vulkan_wrappers/vulkan_sync.hpp"
 #include <vulkan/vulkan.h>
 
 
@@ -37,6 +38,10 @@ namespace rndrboi
 	rndrboi::GraphicsPipeline pipeline;
 	rndrboi::Framebuffer framebuffer;
 	rndrboi::CommandManager command_manager;
+
+	rndrboi::Semaphore sem_image_available;
+	rndrboi::Semaphore sem_render_finished;
+	rndrboi::Fence fence_frame_in_flight;
 
 	static RenderingSystem* singleton_instance;
 

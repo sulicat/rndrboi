@@ -364,12 +364,29 @@ void VulkanDeviceInit::create_logical_device( VulkanDevice& dev, const VulkanDev
     dev.queue_fam_info = selected_q_fam;
     VkResult res = vkCreateDevice(dev.physical_device, &create_info, nullptr, &dev.logical_device);
 
+    // get the graphics queue
+    vkGetDeviceQueue( dev.logical_device,
+		      dev.queue_fam_info.graphics_family_indices[0],
+		      0,
+		      &dev.graphics_queue );
+
+    // get the present queue
+    vkGetDeviceQueue( dev.logical_device,
+		      dev.queue_fam_info.present_family_indices[0],
+		      0,
+		      &dev.present_queue );
+
+
     if( res == VK_SUCCESS )
 	std::cout << OK_PRINT << "Logical Device Created\n";
     else
 	std::cout << BAD_PRINT << "Logical Device Failed to create\n";
 }
 
+void VulkanDeviceInit::wait_idle( VulkanDevice& dev )
+{
+    vkDeviceWaitIdle(dev.logical_device);
+}
 
 bool VulkanDeviceInit::clean( VulkanDevice& dev )
 {

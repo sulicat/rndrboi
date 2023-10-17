@@ -6,6 +6,7 @@
 #include "vulkan_wrappers/vulkan_types.hpp"
 #include "vulkan_wrappers/vulkan_framebuffer.hpp"
 #include "vulkan_wrappers/vulkan_graphics_pipeline.hpp"
+#include "vulkan_wrappers/vulkan_sync.hpp"
 #include <vulkan/vulkan.hpp>
 
 namespace rndrboi
@@ -18,6 +19,8 @@ namespace rndrboi
 	void create( VulkanDevice& dev, CommandManagerSettings settings );
 
 	void clean();
+
+	void reset( int buffer_index = 0 );
 
 	void begin_recording( int buffer_index = 0 );
 
@@ -35,6 +38,10 @@ namespace rndrboi
 		   Swapchain& swapchain,
 		   int vert_count,
 		   int buffer_index = 0 );
+
+	void submit( Semaphore& wait_sem, Semaphore signal_sem, Fence completion_fence );
+
+	void present( Swapchain& swapchain, uint32_t image_index, Semaphore& wait_sem );
 
 	VkCommandPool command_pool;
 	std::vector <VkCommandBuffer> command_buffers;

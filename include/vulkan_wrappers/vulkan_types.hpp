@@ -34,6 +34,9 @@ namespace rndrboi
 	std::vector<VkPhysicalDevice>	 available_devices;
 	SwapChainSupportInfo		 swapchain_info;
 	QueFamilyInfo			 queue_fam_info;
+	VkQueue				 graphics_queue;
+	VkQueue				 present_queue;
+
     };
 
     struct VulkanDevicePreferences

@@ -18,6 +18,7 @@ namespace rndrboi
 	void create_surface( VulkanDevice& dev, const VulkanDevicePreferences& pref );
 	void choose_physical_device( VulkanDevice& dev, const VulkanDevicePreferences& pref );
 	void create_logical_device( VulkanDevice& dev, const VulkanDevicePreferences& pref );
+	void wait_idle( VulkanDevice& dev );
 
 	std::vector<VkExtensionProperties> get_supported_extentions();
 	std::vector<VkLayerProperties> get_supported_layers();

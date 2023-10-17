@@ -51,6 +51,12 @@ void CommandManager::create( VulkanDevice& dev, CommandManagerSettings settings 
     }
 }
 
+void CommandManager::reset( int buffer_index )
+{
+    vkResetCommandBuffer( command_buffers[buffer_index], 0 );
+}
+
+
 void CommandManager::begin_recording( int buffer_index )
 {
     VkCommandBufferBeginInfo begin_info{};
@@ -106,7 +112,6 @@ void CommandManager::draw( GraphicsPipeline& pipeline,
 			   int vert_count,
 			   int buffer_index )
 {
-    /*
     vkCmdBindPipeline( command_buffers[ buffer_index ],
 		       VK_PIPELINE_BIND_POINT_GRAPHICS,
 		       pipeline.pipeline );
@@ -114,7 +119,49 @@ void CommandManager::draw( GraphicsPipeline& pipeline,
     vkCmdSetViewport	( command_buffers[ buffer_index ], 0, 1, &pipeline.viewport );
     vkCmdSetScissor	( command_buffers[ buffer_index ], 0, 1, &pipeline.scissor );
     vkCmdDraw		( command_buffers[ buffer_index ], vert_count, 1, 0, 0 );
-    */
+}
+
+
+void CommandManager::submit( Semaphore& wait_sem, Semaphore signal_sem, Fence completion_fence )
+{
+
+    VkSemaphore wait_semaphores[] = { wait_sem.vk_sem };
+    VkPipelineStageFlags wait_stages[] = { VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT };
+    VkSemaphore signal_semaphores[] = { signal_sem.vk_sem };
+
+    VkSubmitInfo submit_info{};
+    submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submit_info.waitSemaphoreCount = 1;
+    submit_info.pWaitSemaphores = wait_semaphores;
+    submit_info.pWaitDstStageMask = wait_stages;
+
+    submit_info.commandBufferCount = 1;
+    submit_info.pCommandBuffers = &command_buffers[0];
+
+    submit_info.signalSemaphoreCount = 1;
+    submit_info.pSignalSemaphores = signal_semaphores;
+
+    VkResult res = vkQueueSubmit( internal_dev->graphics_queue, 1, &submit_info, completion_fence.vk_fence );
+
+    if( res != VK_SUCCESS )
+	std::cout << BAD_PRINT << "ERROR could not submit command buffer\n";
+}
+
+void CommandManager::present( Swapchain& swapchain, uint32_t image_index, Semaphore& wait_sem )
+{
+    VkSwapchainKHR swapchains[] = {swapchain.swapchain};
+    VkSemaphore wait_semaphores[] = {wait_sem.vk_sem};
+
+    VkPresentInfoKHR present_info{};
+    present_info.sType			= VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+    present_info.waitSemaphoreCount	= 1;
+    present_info.pWaitSemaphores	= wait_semaphores;
+    present_info.swapchainCount		= 1;
+    present_info.pSwapchains		= swapchains;
+    present_info.pImageIndices		= &image_index;
+    present_info.pResults		= nullptr;
+
+    vkQueuePresentKHR(internal_dev->present_queue, &present_info);
 }
 
 

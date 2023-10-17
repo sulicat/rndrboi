@@ -2,6 +2,7 @@
 
 #include <vector>
 #include "vulkan_wrappers/vulkan_types.hpp"
+#include "vulkan_wrappers/vulkan_sync.hpp"
 #include <vulkan/vulkan.hpp>
 
 namespace rndrboi
@@ -13,6 +14,7 @@ namespace rndrboi
 	Swapchain();
 	void create( VulkanDevice& dev );
 	void clean();
+	uint32_t acquire_next_image( Semaphore& sem );
 
 	int size();
 	int width();

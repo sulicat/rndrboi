@@ -222,3 +222,16 @@ void Swapchain::create_image_views( VulkanDevice& dev )
 	}
     }
 }
+
+uint32_t Swapchain::acquire_next_image( Semaphore& sem )
+{
+    uint32_t index;
+
+    vkAcquireNextImageKHR( dev_internal->logical_device,
+			   swapchain,
+			   UINT64_MAX,
+			   sem.vk_sem,
+			   VK_NULL_HANDLE, &index);
+
+    return index;
+}
