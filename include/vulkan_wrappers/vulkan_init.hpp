@@ -3,7 +3,7 @@
 #include "window.hpp"
 #include "utils.hpp"
 #include "config.hpp"
-#include "vulkan_types.hpp"
+#include "vulkan_wrappers/vulkan_types.hpp"
 #include <vulkan/vulkan.h>
 
 

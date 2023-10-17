@@ -1,5 +1,5 @@
 #include "utils.hpp"
-#include "vulkan_command_manager.hpp"
+#include "vulkan_wrappers/vulkan_command_manager.hpp"
 
 #define OK_PRINT (A_YELLOW "[VULKAN COMMANDPOOL] " A_RESET)
 #define BAD_PRINT (A_RED "[VULKAN COMMANDPOOL] " A_RESET)
@@ -106,6 +106,7 @@ void CommandManager::draw( GraphicsPipeline& pipeline,
 			   int vert_count,
 			   int buffer_index )
 {
+    /*
     vkCmdBindPipeline( command_buffers[ buffer_index ],
 		       VK_PIPELINE_BIND_POINT_GRAPHICS,
 		       pipeline.pipeline );
@@ -113,6 +114,7 @@ void CommandManager::draw( GraphicsPipeline& pipeline,
     vkCmdSetViewport	( command_buffers[ buffer_index ], 0, 1, &pipeline.viewport );
     vkCmdSetScissor	( command_buffers[ buffer_index ], 0, 1, &pipeline.scissor );
     vkCmdDraw		( command_buffers[ buffer_index ], vert_count, 1, 0, 0 );
+    */
 }
 
 

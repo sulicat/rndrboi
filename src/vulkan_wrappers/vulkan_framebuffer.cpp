@@ -1,5 +1,5 @@
 #include "utils.hpp"
-#include "vulkan_framebuffer.hpp"
+#include "vulkan_wrappers/vulkan_framebuffer.hpp"
 
 
 #define OK_PRINT (A_YELLOW "[VULKAN FRAMEBUFFER] " A_RESET)

@@ -1,11 +1,11 @@
 #pragma once
 
 #include <vector>
-#include "vulkan_render_pass.hpp"
-#include "vulkan_swapchain.hpp"
-#include "vulkan_types.hpp"
-#include "vulkan_framebuffer.hpp"
-#include "vulkan_graphics_pipeline.hpp"
+#include "vulkan_wrappers/vulkan_render_pass.hpp"
+#include "vulkan_wrappers/vulkan_swapchain.hpp"
+#include "vulkan_wrappers/vulkan_types.hpp"
+#include "vulkan_wrappers/vulkan_framebuffer.hpp"
+#include "vulkan_wrappers/vulkan_graphics_pipeline.hpp"
 #include <vulkan/vulkan.hpp>
 
 namespace rndrboi

@@ -1,4 +1,4 @@
-#include "vulkan_graphics_pipeline.hpp"
+#include "vulkan_wrappers/vulkan_graphics_pipeline.hpp"
 #include "utils.hpp"
 
 #define OK_PRINT (A_YELLOW "[VULKAN GRAPHICS PIPELINE] " A_RESET)

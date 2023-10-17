@@ -1,5 +1,5 @@
-#include "vulkan_init.hpp"
-#include "vulkan_api_helpers.hpp"
+#include "vulkan_wrappers/vulkan_init.hpp"
+#include "vulkan_wrappers/vulkan_api_helpers.hpp"
 #include <set>
 
 #define OK_PRINT (A_YELLOW "[VULKAN INIT] " A_RESET)

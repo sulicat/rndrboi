@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include "vulkan_types.hpp"
+#include "vulkan_wrappers/vulkan_types.hpp"
 #include <vulkan/vulkan.hpp>
 
 namespace rndrboi

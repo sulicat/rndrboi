@@ -1,39 +1,41 @@
-#include "vulkan_api.hpp"
-#include "vulkan_api_helpers.hpp"
+#include "systems/rendering_system.hpp"
+#include "vulkan_wrappers/vulkan_api_helpers.hpp"
 
 #include <set>
 #include <algorithm>
 #include <limits>
 
-#define OK_PRINT (A_YELLOW "[VULKAN API] " A_RESET)
-#define BAD_PRINT (A_RED "[VULKAN API] " A_RESET)
+#define ATTENTION_PRINT (A_BLUE "[RENDERING SYSTEM] " A_RESET)
+#define OK_PRINT (A_YELLOW "[RENDERING SYSTEM] " A_RESET)
+#define BAD_PRINT (A_RED "[RENDERING SYSTEM] " A_RESET)
 
 using namespace rndrboi;
 
-VulkanAPI* VulkanAPI::singleton_instance = NULL;
 
-VulkanAPI* VulkanAPI::Instance()
+RenderingSystem* RenderingSystem::singleton_instance = NULL;
+
+RenderingSystem* RenderingSystem::Instance()
 {
     if (!singleton_instance)
     {
-	singleton_instance = new VulkanAPI;
+	singleton_instance = new RenderingSystem;
     }
     return singleton_instance;
 }
 
-//----------------------------------------------------------------------------------------------------
 
-void VulkanAPI::init_default()
+void RenderingSystem::init()
 {
+    // choose device
     rndrboi::VulkanDevicePreferences dev_preferences{};
     dev_preferences.graphics		= true;
     dev_preferences.present		= true;
     dev_preferences.limit_one_queue	= true;
     dev_preferences.debug		= true;
     dev_preferences.print_info		= true;
-
     device_data = VulkanDeviceInit::init( dev_preferences );
 
+    // create swapchain
     swapchain.create( device_data );
 
     // render passes
@@ -64,7 +66,13 @@ void VulkanAPI::init_default()
     command_manager.end_recording();
 }
 
-void VulkanAPI::cleanup()
+void RenderingSystem::step()
+{
+    std::cout << ATTENTION_PRINT
+	      << "step\n";
+}
+
+void RenderingSystem::cleanup()
 {
     command_manager.clean();
     framebuffer.clean();
@@ -72,4 +80,5 @@ void VulkanAPI::cleanup()
     pipeline.clean();
     swapchain.clean();
     VulkanDeviceInit::clean( device_data );
+
 }

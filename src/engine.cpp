@@ -19,8 +19,7 @@ void Engine::init()
     window->title = "rndrboi";
     window->init();
 
-    VulkanAPI::Instance()->init_default();
-
+    RenderingSystem::Instance()->init();
 }
 
 bool Engine::is_running()
@@ -32,12 +31,12 @@ bool Engine::is_running()
 void Engine::step()
 {
     window->handle_input();
+    RenderingSystem::Instance()->step();
 }
 
 int Engine::close()
 {
-    VulkanAPI::Instance()->cleanup();
+    RenderingSystem::Instance()->cleanup();
     Window::Instance()->cleanup();
-
     return 0;
 }
