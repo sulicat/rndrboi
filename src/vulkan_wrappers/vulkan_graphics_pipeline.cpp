@@ -188,6 +188,16 @@ void GraphicsPipeline::create( VulkanDevice& dev, RenderPass& render_pass, Graph
 
 }
 
+void GraphicsPipeline::update_size( float width, float height )
+{
+    viewport.width = width;
+    viewport.height = height;
+    scissor.extent = { (uint32_t)viewport.width, (uint32_t)viewport.height };
+
+    settings.viewport_width = width;
+    settings.viewport_height = height;
+}
+
 void GraphicsPipeline::clean()
 {
 

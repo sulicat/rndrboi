@@ -68,14 +68,30 @@ void RenderingSystem::init()
 
 void RenderingSystem::step()
 {
-    std::cout << ATTENTION_PRINT << "STEP\n";
-
     // wait till the last frame is done drawing
     fence_frame_in_flight.wait();
-    fence_frame_in_flight.reset();
 
-    uint32_t image_index = swapchain.acquire_next_image( sem_image_available );
-    std::cout << ATTENTION_PRINT << "image index: " << image_index << "\n";
+    // check if a resize has occured
+    auto image_res = swapchain.acquire_next_image( sem_image_available );
+    uint32_t image_index = image_res.first;
+
+    if( image_res.second == SWAPCHAIN_STATUS::OUT_OF_DATE )
+    {
+
+	VulkanDeviceInit::wait_idle( device_data );
+	VulkanDeviceInit::update_swapchain_info( device_data );
+	framebuffer.clean();
+	swapchain.clean();
+
+	swapchain.create( device_data );
+	framebuffer.create( device_data, swapchain, render_pass );
+
+	pipeline.update_size( swapchain.width(), swapchain.height() );
+
+	return;
+    }
+
+    fence_frame_in_flight.reset();
 
     command_manager.reset();
 
@@ -103,6 +119,7 @@ void RenderingSystem::cleanup()
     render_pass.clean();
     pipeline.clean();
     swapchain.clean();
+
     VulkanDeviceInit::clean( device_data );
 
 }

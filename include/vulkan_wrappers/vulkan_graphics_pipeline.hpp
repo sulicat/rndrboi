@@ -13,6 +13,7 @@ namespace rndrboi
 	GraphicsPipeline();
 	void create( VulkanDevice& dev, RenderPass& render_pass, GraphicsPipelineSettings settings );
 	VkShaderModule create_shader_module( VulkanDevice& dev, std::vector<char>& code );
+	void update_size( float width, float height );
 	void clean();
 
 	std::vector<char>	 vert_shader;

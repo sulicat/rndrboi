@@ -14,7 +14,7 @@ namespace rndrboi
 	Swapchain();
 	void create( VulkanDevice& dev );
 	void clean();
-	uint32_t acquire_next_image( Semaphore& sem );
+	std::pair<uint32_t, SWAPCHAIN_STATUS> acquire_next_image( Semaphore& sem );
 
 	int size();
 	int width();
@@ -27,7 +27,7 @@ namespace rndrboi
 	VkFormat			 image_format;
 	VkPresentModeKHR		 present_mode;
 	bool				 complete = false;
-	bool				 debug_print = false;
+	bool				 debug_print = true;
 
     private:
 	VkSurfaceFormatKHR	 get_preferred_format( std::vector<VkSurfaceFormatKHR> format_in );

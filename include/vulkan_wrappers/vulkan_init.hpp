@@ -13,11 +13,13 @@ namespace rndrboi
     {
 	VulkanDevice init( const VulkanDevicePreferences& pref );
 	bool create_instance( VulkanDevice& dev, const VulkanDevicePreferences& pref );
-	bool clean( VulkanDevice& dev );
 	void setup_debug_cb( VulkanDevice& dev, const VulkanDevicePreferences& pref );
 	void create_surface( VulkanDevice& dev, const VulkanDevicePreferences& pref );
 	void choose_physical_device( VulkanDevice& dev, const VulkanDevicePreferences& pref );
 	void create_logical_device( VulkanDevice& dev, const VulkanDevicePreferences& pref );
+	bool clean( VulkanDevice& dev );
+
+	void update_swapchain_info( VulkanDevice& dev );
 	void wait_idle( VulkanDevice& dev );
 
 	std::vector<VkExtensionProperties> get_supported_extentions();
@@ -28,7 +30,5 @@ namespace rndrboi
 	QueFamilyInfo que_family_info( VulkanDevice& dev );
     };
 
-
-    std::ostream& operator<<(std::ostream&, SwapChainSupportInfo&);
 
 };

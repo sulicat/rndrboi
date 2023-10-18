@@ -7,6 +7,13 @@
 
 namespace rndrboi
 {
+    enum SWAPCHAIN_STATUS
+    {
+	OK,
+	OUT_OF_DATE,
+	SUBOPTIMAL
+    };
+
     struct SwapChainSupportInfo
     {
 	VkSurfaceCapabilitiesKHR	 capabilities;

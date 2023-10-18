@@ -47,39 +47,38 @@ int Swapchain::height()
 
 void Swapchain::create( VulkanDevice& dev )
 {
-    VkSurfaceFormatKHR chosen_surface_format = get_preferred_format( dev.swapchain_info.formats );
-    VkPresentModeKHR chosen_present_mode = get_preferred_mode( dev.swapchain_info.present_modes );
-    VkExtent2D chosen_extent = get_preferred_extent( dev.swapchain_info.capabilities );
-
-    uint32_t image_count = dev.swapchain_info.capabilities.minImageCount + 1;
+    VkSurfaceFormatKHR chosen_surface_format	= get_preferred_format( dev.swapchain_info.formats );
+    VkPresentModeKHR chosen_present_mode	= get_preferred_mode( dev.swapchain_info.present_modes );
+    VkExtent2D chosen_extent			= get_preferred_extent( dev.swapchain_info.capabilities );
+    uint32_t image_count			= dev.swapchain_info.capabilities.minImageCount + 1;
 
     VkSwapchainCreateInfoKHR create_info{};
-    create_info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-    create_info.surface = dev.surface;
-    create_info.minImageCount = image_count;
-    create_info.imageFormat = chosen_surface_format.format;
-    create_info.imageColorSpace = chosen_surface_format.colorSpace;
-    create_info.imageExtent = chosen_extent;
-    create_info.imageArrayLayers = 1;
-    create_info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+    create_info.sType			= VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+    create_info.surface			= dev.surface;
+    create_info.minImageCount		= image_count;
+    create_info.imageFormat		= chosen_surface_format.format;
+    create_info.imageColorSpace		= chosen_surface_format.colorSpace;
+    create_info.imageExtent		= chosen_extent;
+    create_info.imageArrayLayers	= 1;
+    create_info.imageUsage		= VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
 
     if( dev.queue_fam_info.graphics_family_indices[0] == dev.queue_fam_info.present_family_indices[0] )
     {
-	create_info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
-        create_info.queueFamilyIndexCount = 0;
-	create_info.pQueueFamilyIndices = nullptr;
+	create_info.imageSharingMode		= VK_SHARING_MODE_EXCLUSIVE;
+        create_info.queueFamilyIndexCount	= 0;
+	create_info.pQueueFamilyIndices		= nullptr;
     }
     else
     {
 	std::cout << BAD_PRINT << "ERROR Unhandled case of concurrent que fams\n";
     }
 
-    create_info.preTransform = dev.swapchain_info.capabilities.currentTransform;
-    create_info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-    create_info.presentMode = chosen_present_mode;
-    create_info.clipped = VK_FALSE;
-    create_info.oldSwapchain = VK_NULL_HANDLE;
+    create_info.preTransform	= dev.swapchain_info.capabilities.currentTransform;
+    create_info.compositeAlpha	= VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+    create_info.presentMode	= chosen_present_mode;
+    create_info.clipped		= VK_FALSE;
+    create_info.oldSwapchain	= VK_NULL_HANDLE;
 
     VkResult stat = vkCreateSwapchainKHR( dev.logical_device,
 					  &create_info,
@@ -171,7 +170,6 @@ VkExtent2D Swapchain::get_preferred_extent( VkSurfaceCapabilitiesKHR capabilitie
 
 	    int width, height;
 	    glfwGetFramebufferSize(glfw_window->window, &width, &height);
-
 	    VkExtent2D actualExtent = {
 		static_cast<uint32_t>(width),
 		static_cast<uint32_t>(height)
@@ -223,15 +221,26 @@ void Swapchain::create_image_views( VulkanDevice& dev )
     }
 }
 
-uint32_t Swapchain::acquire_next_image( Semaphore& sem )
+std::pair<uint32_t, SWAPCHAIN_STATUS> Swapchain::acquire_next_image( Semaphore& sem )
 {
     uint32_t index;
+    SWAPCHAIN_STATUS status = OK;
 
-    vkAcquireNextImageKHR( dev_internal->logical_device,
-			   swapchain,
-			   UINT64_MAX,
-			   sem.vk_sem,
-			   VK_NULL_HANDLE, &index);
 
-    return index;
+    VkResult res = vkAcquireNextImageKHR( dev_internal->logical_device,
+					  swapchain,
+					  UINT64_MAX,
+					  sem.vk_sem,
+					  VK_NULL_HANDLE, &index);
+
+    if( res == VK_ERROR_OUT_OF_DATE_KHR )
+	status = OUT_OF_DATE;
+
+    if( res == VK_SUBOPTIMAL_KHR )
+	status = SUBOPTIMAL;
+
+    if( res == VK_SUCCESS )
+	status = OK;
+
+    return std::make_pair(index, status);
 }

@@ -19,28 +19,6 @@ static std::vector<const char*> device_extensions = {
     VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 
-
-std::ostream& operator<<(std::ostream& os, struct SwapChainSupportInfo& info)
-{
-    os << " CAP img_count { " << info.capabilities.currentExtent.width << "x" << info.capabilities.currentExtent.height << " }";
-    os << " Formats { ";
-    for( auto f : info.formats )
-	os << f.format << " ";
-    os << "}";
-
-    os << " Color Space { ";
-    for( auto f : info.formats )
-	os << f.colorSpace << " ";
-    os << "}";
-
-    os << " PRESENT MODES { ";
-    for( auto p : info.present_modes )
-	os << p << " ";
-    os << "}";
-
-    return os;
-}
-
 void VulkanDeviceInit::setup_debug_cb( VulkanDevice& dev, const VulkanDevicePreferences& pref )
 {
     VkDebugUtilsMessengerCreateInfoEXT create_info{};
@@ -142,10 +120,16 @@ void VulkanDeviceInit::choose_physical_device( VulkanDevice& dev_out, const Vulk
 	    SwapChainSupportInfo swap_chain_info = get_swapchain_support_info( dev, dev_out.surface );
 	    dev_out.physical_device = dev;
 	    dev_out.swapchain_info = swap_chain_info;
-
 	    return;
 	}
     }
+}
+
+
+void VulkanDeviceInit::update_swapchain_info( VulkanDevice& dev )
+{
+    SwapChainSupportInfo swap_chain_info = get_swapchain_support_info( dev.physical_device, dev.surface );
+    dev.swapchain_info = swap_chain_info;
 }
 
 SwapChainSupportInfo VulkanDeviceInit::get_swapchain_support_info( VkPhysicalDevice& dev, VkSurfaceKHR& surface )
