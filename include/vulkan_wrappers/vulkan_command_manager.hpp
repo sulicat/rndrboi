@@ -20,31 +20,29 @@ namespace rndrboi
 
 	void clean();
 
-	void reset( int buffer_index = 0 );
+	void reset();
 
-	void begin_recording( int buffer_index = 0 );
+	void begin_recording();
 
-	void end_recording( int buffer_index = 0 );
+	void end_recording();
 
 	void begin_render_pass( RenderPass& render_pass,
 				Swapchain& swapchain,
 				Framebuffer& framebuffer,
-				int image_index,
-				int command_buffer_index = 0 );
+				int image_index );
 
-	void end_render_pass( int command_buffer_index = 0 );
+	void end_render_pass();
 
 	void draw( GraphicsPipeline& pipeline,
 		   Swapchain& swapchain,
-		   int vert_count,
-		   int buffer_index = 0 );
+		   int vert_count );
 
 	void submit( Semaphore& wait_sem, Semaphore signal_sem, Fence completion_fence );
 
 	void present( Swapchain& swapchain, uint32_t image_index, Semaphore& wait_sem );
 
 	VkCommandPool command_pool;
-	std::vector <VkCommandBuffer> command_buffers;
+	VkCommandBuffer command_buffer;
 
     private:
 	VulkanDevice* internal_dev;

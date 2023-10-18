@@ -33,61 +33,55 @@ void CommandManager::create( VulkanDevice& dev, CommandManagerSettings settings 
 	settings.num_command_buffers = 1;
     }
 
-    command_buffers.resize( settings.num_command_buffers );
+    VkCommandBufferAllocateInfo allocate_info{};
+    allocate_info.sType			= VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    allocate_info.commandPool		= command_pool;
+    allocate_info.level			= VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    allocate_info.commandBufferCount	= 1;
 
-    for( int i = 0; i < settings.num_command_buffers; i++ )
-    {
-	VkCommandBufferAllocateInfo allocate_info{};
-	allocate_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-	allocate_info.commandPool = command_pool;
-	allocate_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-	allocate_info.commandBufferCount = 1;
+    res = vkAllocateCommandBuffers( dev.logical_device, &allocate_info, &command_buffer );
 
-	res = vkAllocateCommandBuffers( dev.logical_device, &allocate_info, &command_buffers[i] );
-
-	if( res != VK_SUCCESS )
-	    std::cout << BAD_PRINT << "ERROR Failed to allocate command buffer: " << i << "\n";
-    }
+    if( res != VK_SUCCESS )
+	std::cout << BAD_PRINT << "ERROR Failed to allocate command buffer\n";
 }
 
-void CommandManager::reset( int buffer_index )
+void CommandManager::reset()
 {
-    vkResetCommandBuffer( command_buffers[buffer_index], 0 );
+    vkResetCommandBuffer( command_buffer, 0 );
 }
 
 
-void CommandManager::begin_recording( int buffer_index )
+void CommandManager::begin_recording()
 {
     VkCommandBufferBeginInfo begin_info{};
     begin_info.sType		= VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
     begin_info.flags		= 0;
     begin_info.pInheritanceInfo = nullptr;
 
-    VkResult res = vkBeginCommandBuffer(command_buffers[buffer_index], &begin_info);
+    VkResult res = vkBeginCommandBuffer( command_buffer, &begin_info );
 
     if( res != VK_SUCCESS )
-	std::cout << BAD_PRINT << "ERROR could not begin recording on buffer: " << buffer_index << "\n";
+	std::cout << BAD_PRINT << "ERROR could not begin recording on buffer\n";
 }
 
 
-void CommandManager::end_recording( int buffer_index )
+void CommandManager::end_recording()
 {
 
-    VkResult res = vkEndCommandBuffer( command_buffers[buffer_index] );
+    VkResult res = vkEndCommandBuffer( command_buffer );
     if( res != VK_SUCCESS )
 	std::cout << BAD_PRINT << "ERROR: Failed to record command buffer\n";
 }
 
-void CommandManager::end_render_pass( int buffer_index )
+void CommandManager::end_render_pass()
 {
-    vkCmdEndRenderPass( command_buffers[buffer_index] );
+    vkCmdEndRenderPass( command_buffer );
 }
 
 void CommandManager::begin_render_pass( RenderPass& render_pass,
 					Swapchain& swapchain,
 					Framebuffer& framebuffer,
-					int image_index,
-					int command_buffer_index )
+					int image_index )
 {
 
     VkRenderPassBeginInfo render_pass_info{};
@@ -101,23 +95,22 @@ void CommandManager::begin_render_pass( RenderPass& render_pass,
     render_pass_info.clearValueCount = 1;
     render_pass_info.pClearValues = &clear_color;
 
-    vkCmdBeginRenderPass(command_buffers[0], &render_pass_info, VK_SUBPASS_CONTENTS_INLINE);
+    vkCmdBeginRenderPass(command_buffer, &render_pass_info, VK_SUBPASS_CONTENTS_INLINE);
 
 }
 
 
 void CommandManager::draw( GraphicsPipeline& pipeline,
 			   Swapchain& swapchain,
-			   int vert_count,
-			   int buffer_index )
+			   int vert_count)
 {
-    vkCmdBindPipeline( command_buffers[ buffer_index ],
+    vkCmdBindPipeline( command_buffer,
 		       VK_PIPELINE_BIND_POINT_GRAPHICS,
 		       pipeline.pipeline );
 
-    vkCmdSetViewport	( command_buffers[ buffer_index ], 0, 1, &pipeline.viewport );
-    vkCmdSetScissor	( command_buffers[ buffer_index ], 0, 1, &pipeline.scissor );
-    vkCmdDraw		( command_buffers[ buffer_index ], vert_count, 1, 0, 0 );
+    vkCmdSetViewport	( command_buffer, 0, 1, &pipeline.viewport );
+    vkCmdSetScissor	( command_buffer, 0, 1, &pipeline.scissor );
+    vkCmdDraw		( command_buffer, vert_count, 1, 0, 0 );
 }
 
 
@@ -135,7 +128,7 @@ void CommandManager::submit( Semaphore& wait_sem, Semaphore signal_sem, Fence co
     submit_info.pWaitDstStageMask = wait_stages;
 
     submit_info.commandBufferCount = 1;
-    submit_info.pCommandBuffers = &command_buffers[0];
+    submit_info.pCommandBuffers = &command_buffer;
 
     submit_info.signalSemaphoreCount = 1;
     submit_info.pSignalSemaphores = signal_semaphores;
