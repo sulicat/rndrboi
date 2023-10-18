@@ -77,17 +77,7 @@ void RenderingSystem::step()
 
     if( image_res.second == SWAPCHAIN_STATUS::OUT_OF_DATE )
     {
-
-	VulkanDeviceInit::wait_idle( device_data );
-	VulkanDeviceInit::update_swapchain_info( device_data );
-	framebuffer.clean();
-	swapchain.clean();
-
-	swapchain.create( device_data );
-	framebuffer.create( device_data, swapchain, render_pass );
-
-	pipeline.update_size( swapchain.width(), swapchain.height() );
-
+	recreate_swapchain();
 	return;
     }
 
@@ -104,6 +94,18 @@ void RenderingSystem::step()
     command_manager.submit( sem_image_available, sem_render_finished, fence_frame_in_flight );
 
     command_manager.present( swapchain, image_index, sem_render_finished );
+}
+
+void RenderingSystem::recreate_swapchain()
+{
+    VulkanDeviceInit::wait_idle( device_data );
+    VulkanDeviceInit::update_swapchain_info( device_data );
+    framebuffer.clean();
+    swapchain.clean();
+
+    swapchain.create( device_data );
+    framebuffer.create( device_data, swapchain, render_pass );
+    pipeline.update_size( swapchain.width(), swapchain.height() );
 }
 
 void RenderingSystem::cleanup()

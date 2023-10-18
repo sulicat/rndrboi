@@ -31,6 +31,7 @@ namespace rndrboi
 
 	RenderingSystem(){}
 	~RenderingSystem(){ cleanup(); }
+	void recreate_swapchain();
 
 	rndrboi::VulkanDevice device_data;
 	rndrboi::Swapchain swapchain;

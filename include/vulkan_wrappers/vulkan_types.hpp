@@ -23,10 +23,10 @@ namespace rndrboi
 
     struct QueFamilyInfo
     {
-	std::vector<int>	 graphics_family_indices;
-	std::vector<int>	 present_family_indices;
-	bool			 supports_graphics;
-	bool			 supports_present;
+	int	 graphics_family_index;
+	int	 present_family_index;
+	bool	 supports_graphics;
+	bool	 supports_present;
     };
 
     struct VulkanDevice

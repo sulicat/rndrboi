@@ -63,7 +63,7 @@ void Swapchain::create( VulkanDevice& dev )
     create_info.imageUsage		= VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
 
-    if( dev.queue_fam_info.graphics_family_indices[0] == dev.queue_fam_info.present_family_indices[0] )
+    if( dev.queue_fam_info.graphics_family_index == dev.queue_fam_info.present_family_index )
     {
 	create_info.imageSharingMode		= VK_SHARING_MODE_EXCLUSIVE;
         create_info.queueFamilyIndexCount	= 0;

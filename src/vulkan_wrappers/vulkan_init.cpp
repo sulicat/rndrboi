@@ -279,25 +279,32 @@ QueFamilyInfo VulkanDeviceInit::que_family_info( VulkanDevice& dev )
     std::vector<VkQueueFamilyProperties> q_fams(q_fam_count);
     vkGetPhysicalDeviceQueueFamilyProperties(dev.physical_device, &q_fam_count, q_fams.data());
 
+    out.supports_graphics = false;
+    out.supports_present = false;
+
     for( int i = 0; i < q_fams.size(); i++ )
     {
 	auto q = q_fams[i];
 
 	// graphicss
-	if ( q.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+	if ( q.queueFlags & VK_QUEUE_GRAPHICS_BIT &&
+	     out.supports_graphics == false )
 	{
-	    out.graphics_family_indices.push_back(i);
+	    out.graphics_family_index = i;
+	    out.supports_graphics = true;
 	}
 
 	// presentation
 	VkBool32 present_support = false;
 	vkGetPhysicalDeviceSurfaceSupportKHR( dev.physical_device, i, dev.surface, &present_support );
-	out.present_family_indices.push_back( i );
+	if( present_support &&
+	    out.supports_present == false )
+	{
+	    out.present_family_index = i;
+	    out.supports_present = true;
+	}
 
     }
-
-    out.supports_graphics = out.graphics_family_indices.size() > 0;
-    out.supports_present = out.present_family_indices.size() > 0;
 
     return out;
 }
@@ -307,20 +314,12 @@ void VulkanDeviceInit::create_logical_device( VulkanDevice& dev, const VulkanDev
     QueFamilyInfo selected_q_fam = que_family_info( dev );
     float q_prio = 1.0f;
 
-    std::set<uint32_t> unique_que_index;
-    for( auto i : selected_q_fam.graphics_family_indices )
-    {
-	unique_que_index.insert( i );
-	std::cout << OK_PRINT << "Graphics queue index: " << i << "\n";
-	break; // only 1 queue of every family type ;)
-    }
+    std::cout << OK_PRINT << "Graphics queue index: " << selected_q_fam.graphics_family_index << "\n";
+    std::cout << OK_PRINT << "Present queue index: " << selected_q_fam.present_family_index << "\n";
 
-    for( auto i : selected_q_fam.present_family_indices )
-    {
-	unique_que_index.insert( i );
-	std::cout << OK_PRINT << "Present queue index: " << i << "\n";
-	break; // only 1 queue of every family type ;)
-    }
+    std::set<uint32_t> unique_que_index;
+    unique_que_index.insert( selected_q_fam.graphics_family_index );
+    unique_que_index.insert( selected_q_fam.present_family_index );
 
     std::vector<VkDeviceQueueCreateInfo> queue_create_infos;
     for( auto index : unique_que_index )
@@ -350,13 +349,13 @@ void VulkanDeviceInit::create_logical_device( VulkanDevice& dev, const VulkanDev
 
     // get the graphics queue
     vkGetDeviceQueue( dev.logical_device,
-		      dev.queue_fam_info.graphics_family_indices[0],
+		      dev.queue_fam_info.graphics_family_index,
 		      0,
 		      &dev.graphics_queue );
 
     // get the present queue
     vkGetDeviceQueue( dev.logical_device,
-		      dev.queue_fam_info.present_family_indices[0],
+		      dev.queue_fam_info.present_family_index,
 		      0,
 		      &dev.present_queue );
 

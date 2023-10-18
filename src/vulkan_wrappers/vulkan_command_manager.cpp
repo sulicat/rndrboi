@@ -16,10 +16,9 @@ void CommandManager::create( VulkanDevice& dev, CommandManagerSettings settings 
     internal_dev = &dev;
 
     VkCommandPoolCreateInfo pool_create_info{};
-    pool_create_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-    pool_create_info.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-    // unsafe, but we are assuming we have atleast 1 graphics family
-    pool_create_info.queueFamilyIndex = dev.queue_fam_info.graphics_family_indices[0];
+    pool_create_info.sType		= VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+    pool_create_info.flags		= VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+    pool_create_info.queueFamilyIndex	= dev.queue_fam_info.graphics_family_index;
 
     VkResult res = vkCreateCommandPool( dev.logical_device, &pool_create_info, nullptr, &command_pool );
 
