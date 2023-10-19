@@ -99,18 +99,23 @@ void CommandManager::begin_render_pass( RenderPass& render_pass,
 
 }
 
-void CommandManager::bind_vertex_buffer( VkBuffer buff )
+void CommandManager::bind_vertex_buffer( Buffer& buff )
 {
-    VkBuffer buffers[] = {buff};
+    VkBuffer buffers[] = {buff.buffer};
     VkDeviceSize offsets[] = {0};
-
     vkCmdBindVertexBuffers(command_buffer, 0, 1, buffers, offsets);
+}
+
+void CommandManager::bind_index_buffer( Buffer& buff )
+{
+    vkCmdBindIndexBuffer(command_buffer, buff.buffer, 0, VK_INDEX_TYPE_UINT16);
 }
 
 
 void CommandManager::draw( GraphicsPipeline& pipeline,
 			   Swapchain& swapchain,
-			   int vert_count)
+			   int vert_count,
+			   bool is_indexed )
 {
     vkCmdBindPipeline( command_buffer,
 		       VK_PIPELINE_BIND_POINT_GRAPHICS,
@@ -118,7 +123,11 @@ void CommandManager::draw( GraphicsPipeline& pipeline,
 
     vkCmdSetViewport	( command_buffer, 0, 1, &pipeline.viewport );
     vkCmdSetScissor	( command_buffer, 0, 1, &pipeline.scissor );
-    vkCmdDraw		( command_buffer, vert_count, 1, 0, 0 );
+
+    if( is_indexed )
+	vkCmdDrawIndexed ( command_buffer, vert_count, 1, 0, 0, 0 );
+    else
+	vkCmdDraw ( command_buffer, vert_count, 1, 0, 0 );
 }
 
 

@@ -26,10 +26,16 @@ RenderingSystem* RenderingSystem::Instance()
     return singleton_instance;
 }
 
+
 const std::vector<Vertex> triangle_verts = {
-    { { 0.0f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f} },
-    { { 0.5f,  0.5f, 0.0f}, {0.0f, 1.0f, 0.0f, 1.0f} },
-    { {-0.5f,  0.5f, 0.0f}, {0.0f, 0.0f, 0.0f, 1.0f} }
+    { {-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f} },
+    { { 0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f, 1.0f} },
+    { { 0.5f,  0.5f, 0.0f}, {0.0f, 0.0f, 0.0f, 1.0f} },
+    { {-0.5f,  0.5f, 0.0f}, {0.0f, 1.0f, 1.0f, 1.0f} }
+};
+
+const std::vector<uint16_t> indices = {
+    0,1,2,2,3,0
 };
 
 void RenderingSystem::init()
@@ -71,11 +77,16 @@ void RenderingSystem::init()
 			 });
 
     BufferManager::Instance()->init( device_data );
+
     // create a vertex buffer
     vertex_buffer = BufferManager::Instance()->get_buffer( { .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT } );
-
     void* vertex_buff_ptr = BufferManager::Instance()->get_mapped_memory( vertex_buffer );
     memcpy( vertex_buff_ptr, triangle_verts.data(), triangle_verts.size() * sizeof(Vertex));
+
+    // create a vertex buffer
+    index_buffer = BufferManager::Instance()->get_buffer({ .usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT });
+    void* index_buff_ptr = BufferManager::Instance()->get_mapped_memory( index_buffer );
+    memcpy( index_buff_ptr, indices.data(), indices.size() * sizeof(uint16_t));
 
 
     framebuffer.create( device_data, swapchain, render_pass );
@@ -104,13 +115,15 @@ void RenderingSystem::step()
 
     command_manager.begin_recording();
     command_manager.begin_render_pass( render_pass, swapchain, framebuffer, image_index );
-    command_manager.bind_vertex_buffer( vertex_buffer.buffer );
-    command_manager.draw( pipeline, swapchain, 3 );
+
+    command_manager.bind_vertex_buffer( vertex_buffer );
+    command_manager.bind_index_buffer( index_buffer );
+
+    command_manager.draw( pipeline, swapchain, indices.size(), true );
     command_manager.end_render_pass();
     command_manager.end_recording();
 
     command_manager.submit( sem_image_available, sem_render_finished, fence_frame_in_flight );
-
     command_manager.present( swapchain, image_index, sem_render_finished );
 }
 
@@ -133,6 +146,7 @@ void RenderingSystem::cleanup()
 {
     VulkanDeviceInit::wait_idle( device_data );
 
+    BufferManager::Instance()->clean_buffer(index_buffer);
     BufferManager::Instance()->clean_buffer(vertex_buffer);
     BufferManager::Instance()->clean();
 

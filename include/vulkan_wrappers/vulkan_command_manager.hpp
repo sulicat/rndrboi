@@ -7,6 +7,7 @@
 #include "vulkan_wrappers/vulkan_framebuffer.hpp"
 #include "vulkan_wrappers/vulkan_graphics_pipeline.hpp"
 #include "vulkan_wrappers/vulkan_sync.hpp"
+#include "vulkan_wrappers/vulkan_buffer_manager.hpp"
 #include <vulkan/vulkan.hpp>
 
 namespace rndrboi
@@ -33,11 +34,14 @@ namespace rndrboi
 
 	void end_render_pass();
 
-	void bind_vertex_buffer( VkBuffer buff );
+	void bind_vertex_buffer( Buffer& buff );
+
+	void bind_index_buffer( Buffer& buff );
 
 	void draw( GraphicsPipeline& pipeline,
 		   Swapchain& swapchain,
-		   int vert_count );
+		   int vert_count,
+		   bool is_indexed = false );
 
 	void submit( Semaphore& wait_sem, Semaphore signal_sem, Fence completion_fence );
 
