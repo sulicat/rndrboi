@@ -1,16 +1,19 @@
 #include "systems/rendering_system.hpp"
 #include "vulkan_wrappers/vulkan_api_helpers.hpp"
 
+#include "vulkan_wrappers/vulkan_vertex.hpp"
+
 #include <set>
 #include <algorithm>
 #include <limits>
+
+#include <glm/glm.hpp>
 
 #define ATTENTION_PRINT (A_BLUE "[RENDERING SYSTEM] " A_RESET)
 #define OK_PRINT (A_YELLOW "[RENDERING SYSTEM] " A_RESET)
 #define BAD_PRINT (A_RED "[RENDERING SYSTEM] " A_RESET)
 
 using namespace rndrboi;
-
 
 RenderingSystem* RenderingSystem::singleton_instance = NULL;
 
@@ -23,6 +26,11 @@ RenderingSystem* RenderingSystem::Instance()
     return singleton_instance;
 }
 
+const std::vector<Vertex> triangle_verts = {
+    { { 0.0f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f} },
+    { { 0.5f,  0.5f, 0.0f}, {0.0f, 1.0f, 0.0f, 1.0f} },
+    { {-0.5f,  0.5f, 0.0f}, {0.0f, 1.0f, 0.0f, 1.0f} }
+};
 
 void RenderingSystem::init()
 {
@@ -58,8 +66,11 @@ void RenderingSystem::init()
 			 .frag_shader_path	= "./compiled_shaders/shader.frag.spv",
 			 .viewport_width	= (float)swapchain.width(),
 			 .viewport_height	= (float)swapchain.height(),
-			 .blend_type		= OFF
+			 .shader_attributes = {},
 		     });
+
+    BufferManager::Instance()->init( device_data );
+    vertex_buffer = BufferManager::Instance()->get_buffer( {} );
 
     framebuffer.create( device_data, swapchain, render_pass );
 
@@ -99,18 +110,24 @@ void RenderingSystem::step()
 void RenderingSystem::recreate_swapchain()
 {
     VulkanDeviceInit::wait_idle( device_data );
+
     VulkanDeviceInit::update_swapchain_info( device_data );
+
     framebuffer.clean();
     swapchain.clean();
 
     swapchain.create( device_data );
     framebuffer.create( device_data, swapchain, render_pass );
+
     pipeline.update_size( swapchain.width(), swapchain.height() );
 }
 
 void RenderingSystem::cleanup()
 {
     VulkanDeviceInit::wait_idle( device_data );
+
+    BufferManager::Instance()->clean_buffer(vertex_buffer.first, vertex_buffer.second);
+    BufferManager::Instance()->clean();
 
     sem_image_available.clean();
     sem_render_finished.clean();

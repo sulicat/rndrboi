@@ -11,7 +11,10 @@
 #include "vulkan_wrappers/vulkan_framebuffer.hpp"
 #include "vulkan_wrappers/vulkan_command_manager.hpp"
 #include "vulkan_wrappers/vulkan_sync.hpp"
+#include "vulkan_wrappers/vulkan_buffer_manager.hpp"
 #include <vulkan/vulkan.h>
+
+#include "mesh.hpp"
 
 
 namespace rndrboi
@@ -43,6 +46,8 @@ namespace rndrboi
 	rndrboi::Semaphore sem_image_available;
 	rndrboi::Semaphore sem_render_finished;
 	rndrboi::Fence fence_frame_in_flight;
+
+	std::pair<VkBuffer, VmaAllocation> vertex_buffer;
 
 	static RenderingSystem* singleton_instance;
 

@@ -1,4 +1,5 @@
 #include "vulkan_wrappers/vulkan_graphics_pipeline.hpp"
+
 #include "utils.hpp"
 
 #define OK_PRINT (A_YELLOW "[VULKAN GRAPHICS PIPELINE] " A_RESET)
@@ -43,13 +44,30 @@ void GraphicsPipeline::create( VulkanDevice& dev, RenderPass& render_pass, Graph
 	frag_shader_stage_info
     };
 
+    // get the binding description for the vertex we are gonna use
+    VkVertexInputBindingDescription binding_description = Vertex::binding_description();
+    binding_description.binding = 0;
+
+    // create the pos/col/norm/uv attributes from settings
+    std::vector<VkVertexInputAttributeDescription> v_attribute_descr;
+
+    for( auto& attr : settings.shader_attributes )
+    {
+	VkVertexInputAttributeDescription v_attr;
+	v_attr.binding	= 0;
+	v_attr.location	= attr.location;
+	v_attr.format	= attr.format;
+        v_attr.offset	= attr.offset;
+	v_attribute_descr.push_back(v_attr);
+    }
+
     // vertex binding here / or instancing here
     VkPipelineVertexInputStateCreateInfo vertex_input_state_create_info{};
     vertex_input_state_create_info.sType				= VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    vertex_input_state_create_info.vertexBindingDescriptionCount	= 0;
-    vertex_input_state_create_info.pVertexBindingDescriptions		= nullptr;
-    vertex_input_state_create_info.vertexAttributeDescriptionCount	= 0;
-    vertex_input_state_create_info.pVertexAttributeDescriptions		= nullptr;
+    vertex_input_state_create_info.vertexBindingDescriptionCount	= v_attribute_descr.size() > 0 ? 1 : 0;
+    vertex_input_state_create_info.pVertexBindingDescriptions		= &binding_description;
+    vertex_input_state_create_info.vertexAttributeDescriptionCount	= v_attribute_descr.size();
+    vertex_input_state_create_info.pVertexAttributeDescriptions		= v_attribute_descr.data();
 
     // vertex draw type
     VkPipelineInputAssemblyStateCreateInfo input_assembly_create_info{};

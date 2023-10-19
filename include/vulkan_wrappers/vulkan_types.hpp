@@ -5,6 +5,9 @@
 #include <optional>
 #include <vulkan/vulkan.h>
 
+#include "vulkan_wrappers/vulkan_vertex.hpp"
+
+
 namespace rndrboi
 {
     enum SWAPCHAIN_STATUS
@@ -69,6 +72,14 @@ namespace rndrboi
 	ALPHA_BLEND
     };
 
+
+    struct ShaderAttribute
+    {
+	uint32_t location;
+	uint32_t offset;
+	VkFormat format;
+    };
+
     struct GraphicsPipelineSettings
     {
 	std::string vert_shader_path;
@@ -81,7 +92,11 @@ namespace rndrboi
 	VkPolygonMode polygon_mode	= VK_POLYGON_MODE_FILL;
 	VkCullModeFlagBits cull_mode	= VK_CULL_MODE_BACK_BIT;
 	VkFrontFace front_face		= VK_FRONT_FACE_CLOCKWISE;
-	BLEND_TYPE blend_type		= ALPHA_BLEND;
+	BLEND_TYPE blend_type		= OFF;
+
+	std::vector<ShaderAttribute> shader_attributes =
+	{ { 0, Vertex::offset_pos(), VK_FORMAT_R32G32B32_SFLOAT },
+	  { 1, Vertex::offset_color(), VK_FORMAT_R32G32B32A32_SFLOAT } };
 
 	// add constants for every stage
 	// look at pSpecializationInfo here: https://registry.khronos.org/vulkan/specs/1.3-extensions/man/html/VkPipelineShaderStageCreateInfo.html
@@ -98,6 +113,13 @@ namespace rndrboi
     struct CommandManagerSettings
     {
 	int num_command_buffers = 1;
+    };
+
+    struct BufferSettings
+    {
+	uint32_t buffer_size = 1028;
+	VkBufferUsageFlags usage = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	VkSharingMode sharing_mode = VK_SHARING_MODE_EXCLUSIVE;
     };
 
 };
