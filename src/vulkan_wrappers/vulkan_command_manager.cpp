@@ -99,6 +99,14 @@ void CommandManager::begin_render_pass( RenderPass& render_pass,
 
 }
 
+void CommandManager::bind_vertex_buffer( VkBuffer buff )
+{
+    VkBuffer buffers[] = {buff};
+    VkDeviceSize offsets[] = {0};
+
+    vkCmdBindVertexBuffers(command_buffer, 0, 1, buffers, offsets);
+}
+
 
 void CommandManager::draw( GraphicsPipeline& pipeline,
 			   Swapchain& swapchain,

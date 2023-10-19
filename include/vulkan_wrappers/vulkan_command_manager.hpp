@@ -33,6 +33,8 @@ namespace rndrboi
 
 	void end_render_pass();
 
+	void bind_vertex_buffer( VkBuffer buff );
+
 	void draw( GraphicsPipeline& pipeline,
 		   Swapchain& swapchain,
 		   int vert_count );

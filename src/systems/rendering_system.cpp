@@ -29,7 +29,7 @@ RenderingSystem* RenderingSystem::Instance()
 const std::vector<Vertex> triangle_verts = {
     { { 0.0f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f} },
     { { 0.5f,  0.5f, 0.0f}, {0.0f, 1.0f, 0.0f, 1.0f} },
-    { {-0.5f,  0.5f, 0.0f}, {0.0f, 1.0f, 0.0f, 1.0f} }
+    { {-0.5f,  0.5f, 0.0f}, {0.0f, 0.0f, 0.0f, 1.0f} }
 };
 
 void RenderingSystem::init()
@@ -66,11 +66,17 @@ void RenderingSystem::init()
 			 .frag_shader_path	= "./compiled_shaders/shader.frag.spv",
 			 .viewport_width	= (float)swapchain.width(),
 			 .viewport_height	= (float)swapchain.height(),
-			 .shader_attributes = {},
-		     });
+			 .shader_attributes	= { { 0, Vertex::offset_pos(), VK_FORMAT_R32G32B32_SFLOAT },
+						    { 1, Vertex::offset_color(), VK_FORMAT_R32G32B32A32_SFLOAT } },
+			 });
 
     BufferManager::Instance()->init( device_data );
-    vertex_buffer = BufferManager::Instance()->get_buffer( {} );
+    // create a vertex buffer
+    vertex_buffer = BufferManager::Instance()->get_buffer( { .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT } );
+
+    void* vertex_buff_ptr = BufferManager::Instance()->get_mapped_memory( vertex_buffer );
+    memcpy( vertex_buff_ptr, triangle_verts.data(), triangle_verts.size() * sizeof(Vertex));
+
 
     framebuffer.create( device_data, swapchain, render_pass );
 
@@ -98,6 +104,7 @@ void RenderingSystem::step()
 
     command_manager.begin_recording();
     command_manager.begin_render_pass( render_pass, swapchain, framebuffer, image_index );
+    command_manager.bind_vertex_buffer( vertex_buffer.buffer );
     command_manager.draw( pipeline, swapchain, 3 );
     command_manager.end_render_pass();
     command_manager.end_recording();
@@ -126,7 +133,7 @@ void RenderingSystem::cleanup()
 {
     VulkanDeviceInit::wait_idle( device_data );
 
-    BufferManager::Instance()->clean_buffer(vertex_buffer.first, vertex_buffer.second);
+    BufferManager::Instance()->clean_buffer(vertex_buffer);
     BufferManager::Instance()->clean();
 
     sem_image_available.clean();

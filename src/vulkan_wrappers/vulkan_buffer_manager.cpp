@@ -44,7 +44,7 @@ void BufferManager::init( VulkanDevice& dev )
     is_initialized = true;
 }
 
-std::pair<VkBuffer, VmaAllocation> BufferManager::get_buffer( BufferSettings settings )
+Buffer BufferManager::get_buffer( BufferSettings settings )
 {
 
     if( !is_initialized )
@@ -58,19 +58,44 @@ std::pair<VkBuffer, VmaAllocation> BufferManager::get_buffer( BufferSettings set
 
     VmaAllocationCreateInfo alloc_info = {};
     alloc_info.usage = VMA_MEMORY_USAGE_AUTO;
+    alloc_info.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT; // host accesible
 
     VkBuffer buffer;
     VmaAllocation allocation;
-    VkResult res = vmaCreateBuffer(allocator, &buffer_create_info, &alloc_info, &buffer, &allocation, nullptr);
+    Buffer buffer_out( buffer, allocation, settings.buffer_size );
+
+    VkResult res = vmaCreateBuffer( allocator,
+				    &buffer_create_info,
+				    &alloc_info,
+				    &buffer_out.buffer,
+				    &buffer_out.allocation,
+				    nullptr );
     if( res != VK_SUCCESS )
 	std::cout << BAD_PRINT << "ERROR could not create buffer of size: " << buffer_create_info.size << "\n";
 
-    return std::move( std::make_pair(buffer, allocation) );
+    return std::move( buffer_out );
 }
 
-void BufferManager::clean_buffer( VkBuffer buffer, VmaAllocation alloc )
+void* BufferManager::get_mapped_memory( Buffer& buff )
 {
-    vmaDestroyBuffer(allocator, buffer, alloc);
+    if( !buff.is_good() )
+	std::cout << BAD_PRINT << "ERROR buffer memory mapping failed. Buffer not initialized properly\n";
+
+    if( !buff.is_mapped )
+    {
+	vmaMapMemory(allocator, buff.allocation, &buff.mapped_memory);
+	buff.is_mapped = true;
+    }
+
+    return buff.mapped_memory;
+}
+
+void BufferManager::clean_buffer( Buffer& buff )
+{
+    if( buff.is_mapped )
+	vmaUnmapMemory(allocator, buff.allocation);
+
+    vmaDestroyBuffer(allocator, buff.buffer, buff.allocation);
 }
 
 void BufferManager::clean()
@@ -79,3 +104,9 @@ void BufferManager::clean()
 }
 
 
+StagingBufferPair BufferManager::get_staing_buffer_pair( int size, VkBufferUsageFlags usage )
+{
+    StagingBufferPair out;
+    std::cout << BAD_PRINT << "Todo: staging buffers\n";
+    return std::move(out);
+}

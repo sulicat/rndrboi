@@ -46,8 +46,7 @@ namespace rndrboi
 	rndrboi::Semaphore sem_image_available;
 	rndrboi::Semaphore sem_render_finished;
 	rndrboi::Fence fence_frame_in_flight;
-
-	std::pair<VkBuffer, VmaAllocation> vertex_buffer;
+	rndrboi::Buffer vertex_buffer;
 
 	static RenderingSystem* singleton_instance;
 
