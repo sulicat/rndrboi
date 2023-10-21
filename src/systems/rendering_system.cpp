@@ -50,6 +50,8 @@ struct TestUniform
     float col;
 };
 
+float col2;
+
 void RenderingSystem::init()
 {
     std::cout << OK_PRINT << "init\n";
@@ -78,14 +80,16 @@ void RenderingSystem::init()
 
     BufferManager::Instance()->init( device_data );
 
-    uniform_manager.create( device_data );
-    Uniform* uniform_mvp = uniform_manager.add_uniform<ModelViewProjection>("mvp", 0);
-    mvp_buff_ptr = uniform_mvp->data_ptr;
-
-    Uniform* uniform_test_float = uniform_manager.add_uniform<TestUniform>("test", 1);
+    uniform_manager.create( device_data, 0 );
+    Uniform* uniform_test_float = uniform_manager.add_uniform<TestUniform>("test", 0);
     test_float_buff_ptr = uniform_test_float->data_ptr;
-
     uniform_manager.done();
+
+
+    uniform_manager2.create( device_data, 1 );
+    Uniform* uniform_mvp = uniform_manager2.add_uniform<ModelViewProjection>("mvp", 0);
+    mvp_buff_ptr = uniform_mvp->data_ptr;
+    uniform_manager2.done();
 
     // pipelines
     pipeline.create( device_data,
@@ -97,7 +101,7 @@ void RenderingSystem::init()
 			 .viewport_height	= (float)swapchain.height(),
 			 .shader_attributes	= { { 0, Vertex::offset_pos(), VK_FORMAT_R32G32B32_SFLOAT },
 						    { 1, Vertex::offset_color(), VK_FORMAT_R32G32B32A32_SFLOAT } },
-			 .descriptor_layouts	= { uniform_manager.get_layout() },
+			 .descriptor_layouts	= { uniform_manager.get_layout(), uniform_manager2.get_layout() },
 			 });
 
     // create a vertex buffer
@@ -167,7 +171,12 @@ void RenderingSystem::step()
     command_manager.bind_vertex_buffer( vertex_buffer );
     command_manager.bind_index_buffer( index_buffer );
 
-    command_manager.draw( pipeline, swapchain, uniform_manager, indices.size(), true );
+    command_manager.draw( pipeline,
+			  swapchain,
+			  { &uniform_manager, &uniform_manager2 },
+			  indices.size(),
+			  true );
+
     command_manager.end_render_pass();
     command_manager.end_recording();
 

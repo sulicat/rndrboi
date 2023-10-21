@@ -25,7 +25,7 @@ namespace rndrboi
     {
     public:
 	UniformManager();
-	void create( VulkanDevice& dev );
+	void create( VulkanDevice& dev, uint32_t descriptor_set_binding_in = 0 );
 
 	template <typename T>
 	Uniform* add_uniform( std::string name, uint32_t bind_point )
@@ -53,6 +53,7 @@ namespace rndrboi
 
 	VkDescriptorSet descriptor_set;
 	VkDescriptorPool descriptor_pool;
+	uint32_t descriptor_set_binding;
 
     private:
 	VulkanDevice* internal_device;

@@ -10,10 +10,11 @@ UniformManager::UniformManager()
 
 }
 
-void UniformManager::create( VulkanDevice& dev )
+void UniformManager::create( VulkanDevice& dev, uint32_t descriptor_set_binding_in)
 {
     internal_device = &dev;
 
+    descriptor_set_binding = descriptor_set_binding_in;
 }
 
 void UniformManager::done()

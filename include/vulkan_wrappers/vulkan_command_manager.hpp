@@ -40,13 +40,13 @@ namespace rndrboi
 	void bind_index_buffer( Buffer& buff );
 
 	void bind_descriptor_sets( GraphicsPipeline& pipeline,
-				   UniformManager& uniform_manager );
+				   std::vector<UniformManager*> uniform_managers );
 
 	void draw( GraphicsPipeline& pipeline,
 		   Swapchain& swapchain,
-		   UniformManager& uniform_manager,
+		   std::vector<UniformManager*> uniform_managers,
 		   int vert_count,
-		   bool is_indexed = false );
+		   bool is_indexed );
 
 	void submit( Semaphore& wait_sem, Semaphore signal_sem, Fence completion_fence );
 

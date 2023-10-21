@@ -39,9 +39,10 @@ VKAPI_ATTR VkBool32 VKAPI_CALL debug_cb( VkDebugUtilsMessageSeverityFlagBitsEXT 
 	return VK_FALSE;
     }
 
-    std::cout << A_RED << "[VULKAN type: 0x" << std::hex <<  (int)message_type << " sev: 0x" << std::hex << message_severity << "] " << A_RESET
+    std::cout << "\n"
+	      << A_RED << "[VULKAN type: 0x" << std::hex <<  (int)message_type << " sev: 0x" << std::hex << message_severity << "] " << A_RESET
 	      << pCallbackData->pMessage
-	      << "\n";
+	      << "\n\n";
 
     return VK_FALSE;
 }

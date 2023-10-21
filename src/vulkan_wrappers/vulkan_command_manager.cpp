@@ -113,21 +113,26 @@ void CommandManager::bind_index_buffer( Buffer& buff )
 
 
 void CommandManager::bind_descriptor_sets( GraphicsPipeline& pipeline,
-					   UniformManager& uniform_manager )
+					   std::vector<UniformManager*> uniform_managers)
+
 {
+    std::vector<VkDescriptorSet> sets = std::vector<VkDescriptorSet>(uniform_managers.size());
+    for( int i = 0; i < uniform_managers.size(); i++ )
+	sets[i] = uniform_managers[i]->descriptor_set;
+
     vkCmdBindDescriptorSets( command_buffer,
 			     VK_PIPELINE_BIND_POINT_GRAPHICS,
 			     pipeline.pipeline_layout,
 			     0,
-			     1,
-			     &uniform_manager.descriptor_set,
+			     sets.size(),
+			     sets.data(),
 			     0,
 			     nullptr );
 }
 
 void CommandManager::draw( GraphicsPipeline& pipeline,
 			   Swapchain& swapchain,
-			   UniformManager& uniform_manager,
+			   std::vector<UniformManager*> uniform_managers,
 			   int vert_count,
 			   bool is_indexed )
 {
@@ -138,7 +143,7 @@ void CommandManager::draw( GraphicsPipeline& pipeline,
     vkCmdSetViewport	( command_buffer, 0, 1, &pipeline.viewport );
     vkCmdSetScissor	( command_buffer, 0, 1, &pipeline.scissor );
 
-    bind_descriptor_sets( pipeline, uniform_manager );
+    bind_descriptor_sets( pipeline, uniform_managers );
 
     if( is_indexed )
 	vkCmdDrawIndexed ( command_buffer, vert_count, 1, 0, 0, 0 );
