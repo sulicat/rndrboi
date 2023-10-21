@@ -12,6 +12,7 @@
 #include "vulkan_wrappers/vulkan_command_manager.hpp"
 #include "vulkan_wrappers/vulkan_sync.hpp"
 #include "vulkan_wrappers/vulkan_buffer_manager.hpp"
+#include "vulkan_wrappers/vulkan_uniform_manager.hpp"
 #include <vulkan/vulkan.h>
 
 #include "mesh.hpp"
@@ -46,6 +47,11 @@ namespace rndrboi
 	rndrboi::Semaphore sem_image_available;
 	rndrboi::Semaphore sem_render_finished;
 	rndrboi::Fence fence_frame_in_flight;
+
+	rndrboi::UniformManager uniform_manager;
+
+	//rndrboi::Buffer mvp_buffer;
+	void* mvp_buff_ptr;
 
 	rndrboi::Buffer vertex_buffer;
 	rndrboi::Buffer index_buffer;

@@ -98,6 +98,8 @@ namespace rndrboi
 	{ { 0, Vertex::offset_pos(), VK_FORMAT_R32G32B32_SFLOAT },
 	  { 1, Vertex::offset_color(), VK_FORMAT_R32G32B32A32_SFLOAT } };
 
+	std::vector<VkDescriptorSetLayout> descriptor_layouts;
+
 	// add constants for every stage
 	// look at pSpecializationInfo here: https://registry.khronos.org/vulkan/specs/1.3-extensions/man/html/VkPipelineShaderStageCreateInfo.html
 
@@ -117,9 +119,15 @@ namespace rndrboi
 
     struct BufferSettings
     {
-	uint32_t buffer_size = 1028;
-	VkBufferUsageFlags usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT; // vertex buffer by default
-	VkSharingMode sharing_mode = VK_SHARING_MODE_EXCLUSIVE;
+	uint32_t buffer_size		= 1028;
+	VkBufferUsageFlags usage	= VK_BUFFER_USAGE_VERTEX_BUFFER_BIT; // vertex buffer by default
+	VkSharingMode sharing_mode	= VK_SHARING_MODE_EXCLUSIVE;
     };
 
+    struct DescriptorSetSettings
+    {
+	uint32_t binding = 0;
+	//stage here
+	
+    };
 };

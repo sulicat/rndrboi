@@ -8,6 +8,7 @@
 #include <limits>
 
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #define ATTENTION_PRINT (A_BLUE "[RENDERING SYSTEM] " A_RESET)
 #define OK_PRINT (A_YELLOW "[RENDERING SYSTEM] " A_RESET)
@@ -26,7 +27,6 @@ RenderingSystem* RenderingSystem::Instance()
     return singleton_instance;
 }
 
-
 const std::vector<Vertex> triangle_verts = {
     { {-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f} },
     { { 0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f, 1.0f} },
@@ -36,6 +36,13 @@ const std::vector<Vertex> triangle_verts = {
 
 const std::vector<uint16_t> indices = {
     0,1,2,2,3,0
+};
+
+struct ModelViewProjection
+{
+    glm::mat4 model;
+    glm::mat4 view;
+    glm::mat4 projection;
 };
 
 void RenderingSystem::init()
@@ -64,6 +71,13 @@ void RenderingSystem::init()
 			    .format = swapchain.image_format
 			});
 
+    BufferManager::Instance()->init( device_data );
+
+    uniform_manager.create( device_data );
+    Uniform* uniform_mvp = uniform_manager.add_uniform<ModelViewProjection>("mvp", 0);
+    mvp_buff_ptr = uniform_mvp->data_ptr;
+    uniform_manager.done();
+
     // pipelines
     pipeline.create( device_data,
 		     render_pass,
@@ -74,9 +88,8 @@ void RenderingSystem::init()
 			 .viewport_height	= (float)swapchain.height(),
 			 .shader_attributes	= { { 0, Vertex::offset_pos(), VK_FORMAT_R32G32B32_SFLOAT },
 						    { 1, Vertex::offset_color(), VK_FORMAT_R32G32B32A32_SFLOAT } },
+			 .descriptor_layouts	= uniform_manager.get_layouts(),
 			 });
-
-    BufferManager::Instance()->init( device_data );
 
     // create a vertex buffer
     vertex_buffer = BufferManager::Instance()->get_buffer( { .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT } );
@@ -111,6 +124,26 @@ void RenderingSystem::step()
 
     fence_frame_in_flight.reset();
 
+                                                                                
+    static float i = 0;
+    i += 0.01;
+
+    ModelViewProjection mvp;
+    mvp.model =  glm::rotate( glm::mat4(1.0f), i* glm::radians(90.0f),
+			      glm::vec3(0.0f, 0.0f, 1.0f) );
+
+    mvp.view =  glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f),
+			    glm::vec3(0.0f, 0.0f, 0.0f),
+			    glm::vec3(0.0f, 0.0f, 1.0f));
+
+    mvp.projection = glm::perspective(glm::radians(45.0f),
+				      (float)swapchain.width() / (float)swapchain.height(), 0.1f,
+				      10.0f);
+    memcpy( mvp_buff_ptr,
+	    &mvp,
+	    sizeof(ModelViewProjection) );
+                                                                                
+
     command_manager.reset();
 
     command_manager.begin_recording();
@@ -119,7 +152,7 @@ void RenderingSystem::step()
     command_manager.bind_vertex_buffer( vertex_buffer );
     command_manager.bind_index_buffer( index_buffer );
 
-    command_manager.draw( pipeline, swapchain, indices.size(), true );
+    command_manager.draw( pipeline, swapchain, uniform_manager, indices.size(), true );
     command_manager.end_render_pass();
     command_manager.end_recording();
 

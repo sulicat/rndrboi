@@ -158,8 +158,8 @@ void GraphicsPipeline::create( VulkanDevice& dev, RenderPass& render_pass, Graph
     // layout
     VkPipelineLayoutCreateInfo pipeline_layout_create_info{};
     pipeline_layout_create_info.sType			= VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    pipeline_layout_create_info.setLayoutCount		= 0;		// Optional
-    pipeline_layout_create_info.pSetLayouts		= nullptr;	// Optional
+    pipeline_layout_create_info.setLayoutCount		= settings.descriptor_layouts.size();
+    pipeline_layout_create_info.pSetLayouts		= settings.descriptor_layouts.data();
     pipeline_layout_create_info.pushConstantRangeCount	= 0;		// Optional
     pipeline_layout_create_info.pPushConstantRanges	= nullptr;	// Optional
 

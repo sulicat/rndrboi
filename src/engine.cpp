@@ -19,8 +19,27 @@ void Engine::init()
     window->title = "rndrboi";
     window->init();
 
+    scene = new Scene();
+
     RenderingSystem::Instance()->init();
 }
+
+Scene Engine::create_scene()
+{
+    Scene scene_out;
+    return std::move(scene_out);
+}
+
+void Engine::set_scene( Scene& new_scene )
+{
+    scene = &new_scene;
+}
+
+Scene& Engine::get_scene()
+{
+    return *scene;
+}
+
 
 bool Engine::is_running()
 {
