@@ -2,7 +2,6 @@
 
 #include <vector>
 #include "vulkan_wrappers/vulkan_render_pass.hpp"
-#include "vulkan_wrappers/vulkan_descriptor_set.hpp"
 #include "vulkan_wrappers/vulkan_types.hpp"
 #include <vulkan/vulkan.hpp>
 

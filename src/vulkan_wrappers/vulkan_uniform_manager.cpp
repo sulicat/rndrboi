@@ -45,19 +45,17 @@ void UniformManager::done()
 	std::cout << BAD_PRINT << "ERROR could not create descriptor pool\n";
 
     // create descriptor sets ------------------------------------------------------------
-    std::vector<VkDescriptorSetLayout> layouts = get_layouts();
+    VkDescriptorSetLayout layout = get_layout();
 
     VkDescriptorSetAllocateInfo alloc_info{};
     alloc_info.sType			= VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
     alloc_info.descriptorPool		= descriptor_pool;
-    alloc_info.descriptorSetCount	= (uint32_t)uniforms.size();
-    alloc_info.pSetLayouts		= layouts.data();
-
-    descriptor_sets.resize( (uint32_t)uniforms.size() );
+    alloc_info.descriptorSetCount	= 1;
+    alloc_info.pSetLayouts		= &layout;
 
     res = vkAllocateDescriptorSets( internal_device->logical_device,
 				    &alloc_info,
-				    descriptor_sets.data() );
+				    &descriptor_set );
 
     if( res != VK_SUCCESS )
 	std::cout << BAD_PRINT << "ERROR could not create descriptor sets\n";
@@ -66,24 +64,22 @@ void UniformManager::done()
     for( int i = 0; i < uniforms.size(); i++ )
     {
 	Uniform* uni = uniforms[i];
-	std::cout << OK_PRINT << "  " << "configuring: " << uni->name << "\n";
 
 	VkDescriptorBufferInfo buffer_info{};
-	buffer_info.buffer = uni->buffer.buffer;
-	buffer_info.offset = 0;
-	buffer_info.range = uni->size;
+	buffer_info.buffer	= uni->buffer.buffer;
+	buffer_info.offset	= 0;
+	buffer_info.range	= uni->size;
 
 	VkWriteDescriptorSet descriptor_write{};
-        descriptor_write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-	descriptor_write.dstSet = descriptor_sets[i];
-	descriptor_write.dstBinding = uni->bind_point;
-	descriptor_write.dstArrayElement = 0;
-	descriptor_write.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	descriptor_write.descriptorCount = 1;
-	descriptor_write.pBufferInfo = &buffer_info;
-	//descriptor_write.pImageInfo = nullptr; // Optional
-	//descriptor_write.pTexelBufferView = nullptr; // Optional
-
+        descriptor_write.sType			= VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	descriptor_write.dstSet			= descriptor_set;
+	descriptor_write.dstBinding		= uni->bind_point;
+	descriptor_write.dstArrayElement	= 0;
+	descriptor_write.descriptorType		= VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	descriptor_write.descriptorCount	= 1;
+	descriptor_write.pBufferInfo		= &buffer_info;
+	//descriptor_write.pImageInfo		= nullptr; // Optional
+	//descriptor_write.pTexelBufferView	= nullptr; // Optional
 
 	vkUpdateDescriptorSets( internal_device->logical_device,
 				1,
@@ -94,14 +90,36 @@ void UniformManager::done()
 
 }
 
-std::vector<VkDescriptorSetLayout> UniformManager::get_layouts()
+VkDescriptorSetLayout UniformManager::get_layout()
 {
-    std::vector<VkDescriptorSetLayout> out;
+    VkDescriptorSetLayout out;
 
-    for( auto uni : uniforms )
-	out.push_back( uni->descriptor_set.descriptor_set_layout );
+    std::vector<VkDescriptorSetLayoutBinding> layout_bindings;
+    layout_bindings.resize( uniforms.size() );
 
-    return out;
+    for( int i = 0; i < uniforms.size(); i++ )
+    {
+	layout_bindings[i].binding		= uniforms[i]->bind_point;
+	layout_bindings[i].descriptorType	= VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	layout_bindings[i].descriptorCount	= 1;
+	layout_bindings[i].stageFlags		= VK_SHADER_STAGE_ALL_GRAPHICS;
+	layout_bindings[i].pImmutableSamplers	= nullptr;
+    }
+
+    VkDescriptorSetLayoutCreateInfo layout_create_info{};
+    layout_create_info.sType		= VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    layout_create_info.bindingCount	= layout_bindings.size();
+    layout_create_info.pBindings	= layout_bindings.data();
+
+    VkResult res = vkCreateDescriptorSetLayout( internal_device->logical_device,
+						&layout_create_info,
+						nullptr,
+						&out );
+
+    if( res != VK_SUCCESS )
+	std::cout << BAD_PRINT << "ERROR could not create descriptor set layout\n";
+
+    return std::move(out);
 }
 
 void UniformManager::clean()

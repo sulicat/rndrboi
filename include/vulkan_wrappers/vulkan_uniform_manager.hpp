@@ -2,7 +2,6 @@
 
 #include "vulkan_wrappers/vulkan_types.hpp"
 #include "vulkan_wrappers/vulkan_buffer_manager.hpp"
-#include "vulkan_wrappers/vulkan_descriptor_set.hpp"
 #include <vulkan/vulkan.hpp>
 
 #include "utils.hpp"
@@ -19,7 +18,6 @@ namespace rndrboi
 	int size;
 	int bind_point;
 	std::string name;
-	DescriptorSet descriptor_set;
 	rndrboi::Buffer buffer;
     };
 
@@ -36,8 +34,6 @@ namespace rndrboi
 	    out->size = sizeof(T);
 	    out->name = name;
 	    out->bind_point = bind_point;
-	    out->descriptor_set.create( *internal_device,
-				       { .binding = bind_point } );
 
 	    // create a buffer to map for this uniform
 	    out->buffer = BufferManager::Instance()->get_buffer( { .usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT } );
@@ -51,10 +47,11 @@ namespace rndrboi
 	}
 
 	std::vector<VkDescriptorSetLayout> get_layouts();
+	VkDescriptorSetLayout get_layout();
 	void done();
 	void clean();
 
-	std::vector<VkDescriptorSet> descriptor_sets;
+	VkDescriptorSet descriptor_set;
 	VkDescriptorPool descriptor_pool;
 
     private:

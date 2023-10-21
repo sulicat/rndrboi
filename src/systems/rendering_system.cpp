@@ -45,6 +45,11 @@ struct ModelViewProjection
     glm::mat4 projection;
 };
 
+struct TestUniform
+{
+    float col;
+};
+
 void RenderingSystem::init()
 {
     std::cout << OK_PRINT << "init\n";
@@ -76,6 +81,10 @@ void RenderingSystem::init()
     uniform_manager.create( device_data );
     Uniform* uniform_mvp = uniform_manager.add_uniform<ModelViewProjection>("mvp", 0);
     mvp_buff_ptr = uniform_mvp->data_ptr;
+
+    Uniform* uniform_test_float = uniform_manager.add_uniform<TestUniform>("test", 1);
+    test_float_buff_ptr = uniform_test_float->data_ptr;
+
     uniform_manager.done();
 
     // pipelines
@@ -88,7 +97,7 @@ void RenderingSystem::init()
 			 .viewport_height	= (float)swapchain.height(),
 			 .shader_attributes	= { { 0, Vertex::offset_pos(), VK_FORMAT_R32G32B32_SFLOAT },
 						    { 1, Vertex::offset_color(), VK_FORMAT_R32G32B32A32_SFLOAT } },
-			 .descriptor_layouts	= uniform_manager.get_layouts(),
+			 .descriptor_layouts	= { uniform_manager.get_layout() },
 			 });
 
     // create a vertex buffer
@@ -142,6 +151,12 @@ void RenderingSystem::step()
     memcpy( mvp_buff_ptr,
 	    &mvp,
 	    sizeof(ModelViewProjection) );
+
+    float col_temp = sin(i * 0.5);
+    memcpy( test_float_buff_ptr,
+	    &col_temp,
+	    sizeof(float) );
+
                                                                                 
 
     command_manager.reset();

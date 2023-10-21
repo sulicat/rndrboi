@@ -52,6 +52,7 @@ namespace rndrboi
 
 	//rndrboi::Buffer mvp_buffer;
 	void* mvp_buff_ptr;
+	void* test_float_buff_ptr;
 
 	rndrboi::Buffer vertex_buffer;
 	rndrboi::Buffer index_buffer;

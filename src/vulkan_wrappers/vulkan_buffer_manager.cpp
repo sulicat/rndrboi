@@ -46,7 +46,6 @@ void BufferManager::init( VulkanDevice& dev )
 
 Buffer BufferManager::get_buffer( BufferSettings settings )
 {
-
     if( !is_initialized )
 	std::cout << BAD_PRINT << "ERROR Need to call init( dev ) on buffer manager\n";
 

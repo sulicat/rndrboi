@@ -32,3 +32,4 @@
 *.app
 
 compiled_shaders/
+apps/bin/
