@@ -6,6 +6,7 @@ using namespace rndrboi;
 Config* Config::instance = NULL;
 
 Config::Config(){}
+
 Config::~Config(){}
 
 

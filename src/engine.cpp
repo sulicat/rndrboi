@@ -8,7 +8,6 @@ Engine::Engine()
 
 Engine::~Engine()
 {
-
 }
 
 void Engine::init()
@@ -48,6 +47,7 @@ bool Engine::is_running()
 void Engine::step()
 {
     window->handle_input();
+    InputSystem::Instance()->step();
     RenderingSystem::Instance()->step( *scene );
 }
 

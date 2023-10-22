@@ -22,6 +22,13 @@
 namespace rndrboi
 {
 
+    struct UniformModelViewProjection
+    {
+	glm::mat4 model;
+	glm::mat4 view;
+	glm::mat4 projection;
+    };
+
     class RenderingSystem
     {
     public:
@@ -50,8 +57,8 @@ namespace rndrboi
 	rndrboi::Fence fence_frame_in_flight;
 
 	rndrboi::UniformManager uniform_manager;
-
-	void* mvp_buff_ptr;
+	UniformModelViewProjection model_view_projection;
+	void* model_view_projection_ptr;
 
 	rndrboi::Buffer vertex_buffer;
 	rndrboi::Buffer index_buffer;

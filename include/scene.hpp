@@ -1,6 +1,7 @@
 #pragma once
 
 #include "asset_manager.hpp"
+#include "camera.hpp"
 #include "entt/entt.hpp"
 
 namespace rndrboi
@@ -33,10 +34,13 @@ namespace rndrboi
 	    return registry->remove<T>(entity);
 	}
 
+	entt::basic_registry<uint32_t>* registry;
+	Camera camera;
 
     private:
 	Scene();
-	entt::basic_registry<uint32_t>* registry;
+	void hook_inputs();
+
 	friend class Engine;
     };
 

@@ -38,13 +38,6 @@ const std::vector<uint16_t> indices = {
     0,1,2,2,3,0
 };
 
-struct ModelViewProjection
-{
-    glm::mat4 model;
-    glm::mat4 view;
-    glm::mat4 projection;
-};
-
 void RenderingSystem::init()
 {
     std::cout << OK_PRINT << "init\n";
@@ -75,8 +68,8 @@ void RenderingSystem::init()
 
     // model view projection
     uniform_manager.create( device_data );
-    Uniform* uniform_mvp = uniform_manager.add_uniform<ModelViewProjection>("mvp", 0);
-    mvp_buff_ptr = uniform_mvp->data_ptr;
+    Uniform* uniform_mvp = uniform_manager.add_uniform<UniformModelViewProjection>("model_view_projection", 0);
+    model_view_projection_ptr = uniform_mvp->data_ptr;
     uniform_manager.done();
 
     // pipelines
@@ -125,26 +118,19 @@ void RenderingSystem::step( Scene& scene )
 
     fence_frame_in_flight.reset();
 
-                                                                                
+
     static float i = 0;
     i += 0.01;
+    model_view_projection.model =  glm::rotate( glm::mat4(1.0f), i* glm::radians(90.0f),
+						glm::vec3(0.0f, 0.0f, 1.0f) );
 
-    ModelViewProjection mvp;
-    mvp.model =  glm::rotate( glm::mat4(1.0f), i* glm::radians(90.0f),
-			      glm::vec3(0.0f, 0.0f, 1.0f) );
+    model_view_projection.view = scene.camera.get_view_mat();
+    model_view_projection.projection = scene.camera.get_projection_mat();
 
-    mvp.view =  glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f),
-			    glm::vec3(0.0f, 0.0f, 0.0f),
-			    glm::vec3(0.0f, 0.0f, 1.0f));
+    memcpy( model_view_projection_ptr,
+	    &model_view_projection,
+	    sizeof(UniformModelViewProjection) );
 
-    mvp.projection = glm::perspective(glm::radians(45.0f),
-				      (float)swapchain.width() / (float)swapchain.height(), 0.1f,
-				      10.0f);
-    memcpy( mvp_buff_ptr,
-	    &mvp,
-	    sizeof(ModelViewProjection) );
-
-                                                                                
 
     command_manager.reset();
 

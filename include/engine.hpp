@@ -1,6 +1,7 @@
 #include "utils.hpp"
 #include "window.hpp"
 #include "systems/rendering_system.hpp"
+#include "systems/input_system.hpp"
 #include "scene.hpp"
 
 namespace rndrboi

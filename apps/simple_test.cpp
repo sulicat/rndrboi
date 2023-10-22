@@ -21,6 +21,10 @@ int main( int argc, char** argv )
     rndrboi::Scene& scene = engine.get_scene();
     uint32_t cube = scene.create_entity();
 
+    scene.add_component<rndrboi::components::Renderable>	(cube);
+    scene.add_component<rndrboi::components::Mesh>		(cube);
+    scene.add_component<rndrboi::components::Transform>		(cube);
+
     /*
       Desired:
        - add entities to different scenes
