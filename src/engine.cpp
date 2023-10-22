@@ -40,17 +40,15 @@ Scene& Engine::get_scene()
     return *scene;
 }
 
-
 bool Engine::is_running()
 {
     return window->is_open();
 }
 
-
 void Engine::step()
 {
     window->handle_input();
-    RenderingSystem::Instance()->step();
+    RenderingSystem::Instance()->step( *scene );
 }
 
 int Engine::close()

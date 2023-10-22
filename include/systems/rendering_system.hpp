@@ -3,6 +3,7 @@
 #include "window.hpp"
 #include "utils.hpp"
 #include "config.hpp"
+#include "scene.hpp"
 #include "vulkan_wrappers/vulkan_types.hpp"
 #include "vulkan_wrappers/vulkan_init.hpp"
 #include "vulkan_wrappers/vulkan_swapchain.hpp"
@@ -26,7 +27,7 @@ namespace rndrboi
     public:
 
 	void init();
-	void step();
+	void step( Scene& scene );
 	void cleanup();
 
 	static RenderingSystem* Instance();
@@ -50,7 +51,6 @@ namespace rndrboi
 
 	rndrboi::UniformManager uniform_manager;
 
-	//rndrboi::Buffer mvp_buffer;
 	void* mvp_buff_ptr;
 
 	rndrboi::Buffer vertex_buffer;

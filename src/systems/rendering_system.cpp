@@ -108,7 +108,7 @@ void RenderingSystem::init()
     command_manager.create( device_data, {} );
 }
 
-void RenderingSystem::step()
+void RenderingSystem::step( Scene& scene )
 {
     // wait till the last frame is done drawing
     fence_frame_in_flight.wait();

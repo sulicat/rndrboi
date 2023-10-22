@@ -2,14 +2,19 @@
 
 using namespace rndrboi;
 
-int scene_id = 0;
-
 Scene::Scene()
 {
-    id = scene_id++;
+
+    registry = new entt::basic_registry<uint32_t>;
 }
 
 Scene::~Scene()
 {
+    delete registry;
+}
 
+uint32_t Scene::create_entity()
+{
+    uint32_t ent_out = registry->create();
+    return ent_out;
 }

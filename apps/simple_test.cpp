@@ -5,6 +5,12 @@
 
 #include "rndrboi.hpp"
 
+struct Velocity
+{
+    float vx;
+    float vy;
+};
+
 int main( int argc, char** argv )
 {
     std::cout << "STARTING SIMPLE TEST\n";
@@ -13,9 +19,7 @@ int main( int argc, char** argv )
     engine.init();
 
     rndrboi::Scene& scene = engine.get_scene();
-
-    //rndrboi::Scene scene2 = engine.create_scene();
-    // engine.set_scene( scene2 );
+    uint32_t cube = scene.create_entity();
 
     /*
       Desired:
