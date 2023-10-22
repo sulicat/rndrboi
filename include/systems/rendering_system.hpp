@@ -49,11 +49,9 @@ namespace rndrboi
 	rndrboi::Fence fence_frame_in_flight;
 
 	rndrboi::UniformManager uniform_manager;
-	rndrboi::UniformManager uniform_manager2;
 
 	//rndrboi::Buffer mvp_buffer;
 	void* mvp_buff_ptr;
-	void* test_float_buff_ptr;
 
 	rndrboi::Buffer vertex_buffer;
 	rndrboi::Buffer index_buffer;

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "asset_manager.hpp"
+
 namespace rndrboi
 {
     class Engine;

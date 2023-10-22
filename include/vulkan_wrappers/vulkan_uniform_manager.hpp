@@ -46,11 +46,12 @@ namespace rndrboi
 	    return uniforms[uniforms.size()-1];
 	}
 
-	std::vector<VkDescriptorSetLayout> get_layouts();
+	VkDescriptorSetLayout new_layout();
 	VkDescriptorSetLayout get_layout();
 	void done();
 	void clean();
 
+	VkDescriptorSetLayout layout;
 	VkDescriptorSet descriptor_set;
 	VkDescriptorPool descriptor_pool;
 	uint32_t descriptor_set_binding;

@@ -45,13 +45,6 @@ struct ModelViewProjection
     glm::mat4 projection;
 };
 
-struct TestUniform
-{
-    float col;
-};
-
-float col2;
-
 void RenderingSystem::init()
 {
     std::cout << OK_PRINT << "init\n";
@@ -80,16 +73,11 @@ void RenderingSystem::init()
 
     BufferManager::Instance()->init( device_data );
 
-    uniform_manager.create( device_data, 0 );
-    Uniform* uniform_test_float = uniform_manager.add_uniform<TestUniform>("test", 0);
-    test_float_buff_ptr = uniform_test_float->data_ptr;
-    uniform_manager.done();
-
-
-    uniform_manager2.create( device_data, 1 );
-    Uniform* uniform_mvp = uniform_manager2.add_uniform<ModelViewProjection>("mvp", 0);
+    // model view projection
+    uniform_manager.create( device_data );
+    Uniform* uniform_mvp = uniform_manager.add_uniform<ModelViewProjection>("mvp", 0);
     mvp_buff_ptr = uniform_mvp->data_ptr;
-    uniform_manager2.done();
+    uniform_manager.done();
 
     // pipelines
     pipeline.create( device_data,
@@ -101,8 +89,8 @@ void RenderingSystem::init()
 			 .viewport_height	= (float)swapchain.height(),
 			 .shader_attributes	= { { 0, Vertex::offset_pos(), VK_FORMAT_R32G32B32_SFLOAT },
 						    { 1, Vertex::offset_color(), VK_FORMAT_R32G32B32A32_SFLOAT } },
-			 .descriptor_layouts	= { uniform_manager.get_layout(), uniform_manager2.get_layout() },
-			 });
+			 .descriptor_layouts	= { uniform_manager.get_layout() },
+		     });
 
     // create a vertex buffer
     vertex_buffer = BufferManager::Instance()->get_buffer( { .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT } );
@@ -156,11 +144,6 @@ void RenderingSystem::step()
 	    &mvp,
 	    sizeof(ModelViewProjection) );
 
-    float col_temp = sin(i * 0.5);
-    memcpy( test_float_buff_ptr,
-	    &col_temp,
-	    sizeof(float) );
-
                                                                                 
 
     command_manager.reset();
@@ -173,7 +156,7 @@ void RenderingSystem::step()
 
     command_manager.draw( pipeline,
 			  swapchain,
-			  { &uniform_manager, &uniform_manager2 },
+			  { &uniform_manager },
 			  indices.size(),
 			  true );
 
@@ -203,9 +186,10 @@ void RenderingSystem::cleanup()
 {
     VulkanDeviceInit::wait_idle( device_data );
 
+    uniform_manager.clean();
+
     BufferManager::Instance()->clean_buffer(index_buffer);
     BufferManager::Instance()->clean_buffer(vertex_buffer);
-    BufferManager::Instance()->clean();
 
     sem_image_available.clean();
     sem_render_finished.clean();
@@ -217,6 +201,7 @@ void RenderingSystem::cleanup()
     pipeline.clean();
     swapchain.clean();
 
+    BufferManager::Instance()->clean();
     VulkanDeviceInit::clean( device_data );
 
 }

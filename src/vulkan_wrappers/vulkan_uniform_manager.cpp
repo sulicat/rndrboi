@@ -46,7 +46,7 @@ void UniformManager::done()
 	std::cout << BAD_PRINT << "ERROR could not create descriptor pool\n";
 
     // create descriptor sets ------------------------------------------------------------
-    VkDescriptorSetLayout layout = get_layout();
+    layout = new_layout();
 
     VkDescriptorSetAllocateInfo alloc_info{};
     alloc_info.sType			= VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -91,7 +91,7 @@ void UniformManager::done()
 
 }
 
-VkDescriptorSetLayout UniformManager::get_layout()
+VkDescriptorSetLayout UniformManager::new_layout()
 {
     VkDescriptorSetLayout out;
 
@@ -123,6 +123,26 @@ VkDescriptorSetLayout UniformManager::get_layout()
     return std::move(out);
 }
 
+VkDescriptorSetLayout UniformManager::get_layout()
+{
+    return layout;
+}
+
 void UniformManager::clean()
 {
+    for( auto& uni : uniforms )
+    {
+	std::cout << OK_PRINT << " Cleaned uniform: " << uni->name << "\n";
+
+	BufferManager::Instance()->clean_buffer(uni->buffer);
+	delete uni;
+    }
+
+    vkDestroyDescriptorPool( internal_device->logical_device,
+			     descriptor_pool,
+			     nullptr );
+
+    vkDestroyDescriptorSetLayout( internal_device->logical_device,
+				  layout,
+				  nullptr );
 }
