@@ -13,6 +13,16 @@ uint32_t Vertex::offset_color()
     return offsetof(Vertex, color);
 }
 
+uint32_t Vertex::offset_normal()
+{
+    return offsetof(Vertex, normal);
+}
+
+uint32_t Vertex::offset_uv()
+{
+    return offsetof(Vertex, uv);
+}
+
 uint32_t Vertex::stride()
 {
     return sizeof(Vertex);

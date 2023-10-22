@@ -28,10 +28,10 @@ RenderingSystem* RenderingSystem::Instance()
 }
 
 const std::vector<Vertex> triangle_verts = {
-    { {-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f} },
-    { { 0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f, 1.0f} },
-    { { 0.5f,  0.5f, 0.0f}, {0.0f, 0.0f, 0.0f, 1.0f} },
-    { {-0.5f,  0.5f, 0.0f}, {0.0f, 1.0f, 1.0f, 1.0f} }
+    { .pos = {-0.5f, -0.5f, 0.0f}, .color = {1.0f, 0.0f, 0.0f, 1.0f} },
+    { .pos = { 0.5f, -0.5f, 0.0f}, .color = {0.0f, 1.0f, 0.0f, 1.0f} },
+    { .pos = { 0.5f,  0.5f, 0.0f}, .color = {0.0f, 0.0f, 0.0f, 1.0f} },
+    { .pos = {-0.5f,  0.5f, 0.0f}, .color = {0.0f, 1.0f, 1.0f, 1.0f} }
 };
 
 const std::vector<uint16_t> indices = {
@@ -81,7 +81,9 @@ void RenderingSystem::init()
 			 .viewport_width	= (float)swapchain.width(),
 			 .viewport_height	= (float)swapchain.height(),
 			 .shader_attributes	= { { 0, Vertex::offset_pos(), VK_FORMAT_R32G32B32_SFLOAT },
-						    { 1, Vertex::offset_color(), VK_FORMAT_R32G32B32A32_SFLOAT } },
+						    { 1, Vertex::offset_normal(), VK_FORMAT_R32G32B32_SFLOAT },
+						    { 2, Vertex::offset_uv(), VK_FORMAT_R32G32_SFLOAT },
+						    { 3, Vertex::offset_color(), VK_FORMAT_R32G32B32A32_SFLOAT } },
 			 .descriptor_layouts	= { uniform_manager.get_layout() },
 		     });
 

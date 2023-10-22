@@ -20,10 +20,14 @@ int main( int argc, char** argv )
 
     rndrboi::Scene& scene = engine.get_scene();
     uint32_t cube = scene.create_entity();
-
     scene.add_component<rndrboi::components::Renderable>	(cube);
-    scene.add_component<rndrboi::components::Mesh>		(cube);
+    scene.add_component<rndrboi::components::Mesh>		(cube, rndrboi::components::Mesh::CUBE);
     scene.add_component<rndrboi::components::Transform>		(cube);
+
+    uint32_t susanne = scene.create_entity();
+    scene.add_component<rndrboi::components::Renderable>	(susanne);
+    scene.add_component<rndrboi::components::Mesh>		(susanne, "resources/susanne.obj");
+    scene.add_component<rndrboi::components::Transform>		(susanne);
 
     /*
       Desired:

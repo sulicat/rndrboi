@@ -1,9 +1,11 @@
 #version 450
 
 layout(location = 0) in vec3 pos;
-layout(location = 1) in vec4 color;
+layout(location = 1) in vec3 normal;
+layout(location = 2) in vec2 uv;
+layout(location = 3) in vec4 color;
 
-layout(set = 0, binding = 0) uniform UniformBufferObject {
+layout(set = 0, binding = 0) uniform ModelViewProjection {
     mat4 model;
     mat4 view;
     mat4 projection;
