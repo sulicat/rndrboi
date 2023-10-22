@@ -22,10 +22,11 @@ namespace rndrboi
 	Mesh& get_mesh( MESH_ID id );
 
     private:
-	AssetManager(){}
+	AssetManager();
 	~AssetManager(){}
 
 	std::vector<Mesh*> meshes;
+	MESH_ID default_mesh;
 
 	static AssetManager* instance;
     };

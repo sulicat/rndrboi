@@ -62,6 +62,7 @@ namespace rndrboi
 
 	rndrboi::Buffer vertex_buffer;
 	rndrboi::Buffer index_buffer;
+	void* vertex_buff_ptr;
 
 	static RenderingSystem* singleton_instance;
 

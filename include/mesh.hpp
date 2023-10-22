@@ -15,6 +15,8 @@ namespace rndrboi
     public:
 	Mesh();
 
+	int use_indices = false;
+
 	std::vector<Vertex> vertex_data;
     };
 

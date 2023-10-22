@@ -10,9 +10,7 @@ using namespace rndrboi;
 
 Scene::Scene()
 {
-
     registry = new entt::basic_registry<uint32_t>;
-
     hook_inputs();
 }
 

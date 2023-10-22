@@ -40,7 +40,6 @@ int main( int argc, char** argv )
 
      */
 
-
     while( engine.is_running() )
     {
 	engine.step();

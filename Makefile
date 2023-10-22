@@ -16,6 +16,7 @@ SRC_DIR		= src
 SRC		= $(wildcard 	${SRC_DIR}/*.cpp \
 				${SRC_DIR}/systems/*.cpp \
 				${SRC_DIR}/components/*.cpp \
+				${SRC_DIR}/vertex_data/*.cpp \
 				${SRC_DIR}/vulkan_wrappers/*.cpp )
 
 FLAGS		= -std=c++20 -O2 -fPIC

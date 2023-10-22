@@ -1,7 +1,9 @@
 #include "systems/rendering_system.hpp"
 #include "vulkan_wrappers/vulkan_api_helpers.hpp"
-
 #include "vulkan_wrappers/vulkan_vertex.hpp"
+#include "components/renderable.hpp"
+#include "components/mesh_component.hpp"
+
 
 #include <set>
 #include <algorithm>
@@ -88,9 +90,10 @@ void RenderingSystem::init()
 		     });
 
     // create a vertex buffer
-    vertex_buffer = BufferManager::Instance()->get_buffer( { .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT } );
-    void* vertex_buff_ptr = BufferManager::Instance()->get_mapped_memory( vertex_buffer );
-    memcpy( vertex_buff_ptr, triangle_verts.data(), triangle_verts.size() * sizeof(Vertex));
+    vertex_buffer = BufferManager::Instance()->get_buffer({
+	    .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT
+	});
+    vertex_buff_ptr = BufferManager::Instance()->get_mapped_memory( vertex_buffer );
 
     // create a vertex buffer
     index_buffer = BufferManager::Instance()->get_buffer({ .usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT });
@@ -120,6 +123,10 @@ void RenderingSystem::step( Scene& scene )
 
     fence_frame_in_flight.reset();
 
+    // ----------------------------------------------------------------------------------------------------
+
+    // get all renderables
+    auto renderables_view = scene.registry->view<components::Renderable, components::Mesh>();
 
     static float i = 0;
     i += 0.01;
@@ -129,24 +136,37 @@ void RenderingSystem::step( Scene& scene )
     model_view_projection.view = scene.camera.get_view_mat();
     model_view_projection.projection = scene.camera.get_projection_mat();
 
-    memcpy( model_view_projection_ptr,
-	    &model_view_projection,
-	    sizeof(UniformModelViewProjection) );
-
 
     command_manager.reset();
 
     command_manager.begin_recording();
     command_manager.begin_render_pass( render_pass, swapchain, framebuffer, image_index );
 
-    command_manager.bind_vertex_buffer( vertex_buffer );
-    command_manager.bind_index_buffer( index_buffer );
 
-    command_manager.draw( pipeline,
-			  swapchain,
-			  { &uniform_manager },
-			  indices.size(),
-			  true );
+    // every components
+    for(auto ent: renderables_view)
+    {
+        auto& mesh_comp = renderables_view.get<components::Mesh>(ent);
+	auto& mesh = AssetManager::Instance()->get_mesh( mesh_comp.mesh_id );
+
+	memcpy( vertex_buff_ptr,
+		mesh.vertex_data.data(), mesh.vertex_data.size() * sizeof(Vertex));
+
+	command_manager.bind_vertex_buffer( vertex_buffer );
+	command_manager.bind_index_buffer( index_buffer );
+
+
+	memcpy( model_view_projection_ptr,
+		&model_view_projection,
+		sizeof(UniformModelViewProjection) );
+
+
+	command_manager.draw( pipeline,
+			      swapchain,
+			      { &uniform_manager },
+			      mesh.vertex_data.size(),
+			      false );
+    }
 
     command_manager.end_render_pass();
     command_manager.end_recording();
