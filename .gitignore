@@ -33,3 +33,5 @@
 
 compiled_shaders/
 apps/bin/
+node_modules/
+jspm_packages/
