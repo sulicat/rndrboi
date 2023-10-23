@@ -36,7 +36,7 @@ void Scene::hook_inputs()
 							     double dx_percent, double dy_percent )
     {
 	if( button == InputSystem::MouseButton::MOUSE_RIGHT )
-	    camera.pan( dx_percent * 10, -1*dy_percent * 10 );
+	    camera.pan( dx_percent * 10, dy_percent * 10 );
 	else if( button == InputSystem::MouseButton::MOUSE_LEFT )
 	    camera.orbit( dx_percent, dy_percent );
     });

@@ -128,20 +128,17 @@ void RenderingSystem::step( Scene& scene )
     // get all renderables
     auto renderables_view = scene.registry->view<components::Renderable, components::Mesh>();
 
-    static float i = 0;
-    i += 0.01;
-    model_view_projection.model =  glm::rotate( glm::mat4(1.0f), i* glm::radians(90.0f),
-						glm::vec3(0.0f, 0.0f, 1.0f) );
+    glm::mat4 model_mat = glm::mat4(1.0f);
+    glm::mat4 rotate_mat = glm::mat4(1.0f);
+    glm::mat4 scale_mat = glm::mat4(1.0f);
+    glm::mat4 translate_mat = glm::mat4(1.0f);
 
     model_view_projection.view = scene.camera.get_view_mat();
     model_view_projection.projection = scene.camera.get_projection_mat();
 
-
     command_manager.reset();
-
     command_manager.begin_recording();
     command_manager.begin_render_pass( render_pass, swapchain, framebuffer, image_index );
-
 
     // every components
     for(auto ent: renderables_view)
@@ -155,6 +152,7 @@ void RenderingSystem::step( Scene& scene )
 	command_manager.bind_vertex_buffer( vertex_buffer );
 	command_manager.bind_index_buffer( index_buffer );
 
+	model_view_projection.model = model_mat * translate_mat * rotate_mat * scale_mat;;
 
 	memcpy( model_view_projection_ptr,
 		&model_view_projection,
