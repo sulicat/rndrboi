@@ -75,6 +75,33 @@ Buffer* BufferManager::get_buffer( BufferSettings settings )
     return buffer_out;
 }
 
+ImageBuffer* BufferManager::get_image_buffer( ImageBufferSettings settings )
+{
+    if( !is_initialized )
+	std::cout << BAD_PRINT << "ERROR Need to call init( dev ) on buffer manager\n";
+
+    ImageBuffer* image_out = new ImageBuffer();
+
+    VmaAllocationCreateInfo alloc_info = {};
+    alloc_info.usage = VMA_MEMORY_USAGE_AUTO;
+    alloc_info.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT; // host accesible
+
+    VkResult res = vmaCreateImage( allocator,
+				   &settings.create_info,
+				   &alloc_info,
+				   &image_out->image,
+				   &image_out->allocation,
+				   nullptr );
+
+    if( res != VK_SUCCESS )
+	std::cout << BAD_PRINT << "ERROR could not create image\n";
+
+    all_image_buffers.push_back( image_out );
+
+    return image_out;
+}
+
+
 void* BufferManager::get_mapped_memory( Buffer& buff )
 {
     if( !buff.is_good() )
@@ -89,6 +116,21 @@ void* BufferManager::get_mapped_memory( Buffer& buff )
     return buff.mapped_memory;
 }
 
+void* BufferManager::get_mapped_memory( ImageBuffer& buff )
+{
+    if( !buff.is_good() )
+	std::cout << BAD_PRINT << "ERROR image memory mapping failed. Image Buffer not initialized properly\n";
+
+    if( !buff.is_mapped )
+    {
+	vmaMapMemory(allocator, buff.allocation, &buff.mapped_memory);
+	buff.is_mapped = true;
+    }
+
+    return buff.mapped_memory;
+}
+
+
 void BufferManager::clean_buffer( Buffer& buff )
 {
     if( buff.is_mapped )
@@ -97,8 +139,19 @@ void BufferManager::clean_buffer( Buffer& buff )
     vmaDestroyBuffer(allocator, buff.buffer, buff.allocation);
 }
 
+void BufferManager::clean_buffer( ImageBuffer& buff )
+{
+    if( buff.is_mapped )
+	vmaUnmapMemory(allocator, buff.allocation);
+
+    vmaDestroyImage(allocator, buff.image, buff.allocation);
+}
+
 void BufferManager::clean()
 {
+
+    for( int i = 0; i < all_image_buffers.size(); i++ )
+	clean_buffer( *all_image_buffers[i] );
 
     for( int i = 0; i < all_buffers.size(); i++ )
 	clean_buffer( *all_buffers[i] );
@@ -106,10 +159,3 @@ void BufferManager::clean()
     vmaDestroyAllocator(allocator);
 }
 
-
-StagingBufferPair BufferManager::get_staing_buffer_pair( int size, VkBufferUsageFlags usage )
-{
-    StagingBufferPair out;
-    std::cout << BAD_PRINT << "Todo: staging buffers\n";
-    return std::move(out);
-}

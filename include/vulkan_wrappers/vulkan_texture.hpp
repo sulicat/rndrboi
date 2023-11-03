@@ -24,7 +24,8 @@ namespace rndrboi
 
 	rndrboi::Buffer* staging_buffer;
 	void* staging_buffer_ptr = NULL;
-	VkImage image;
+
+	rndrboi::ImageBuffer* image;
 
     private:
 	bool init_success = false;

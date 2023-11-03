@@ -72,7 +72,6 @@ namespace rndrboi
 	ALPHA_BLEND
     };
 
-
     struct ShaderAttribute
     {
 	uint32_t location;
@@ -95,16 +94,9 @@ namespace rndrboi
 	BLEND_TYPE blend_type		= OFF;
 
 	std::vector<ShaderAttribute> shader_attributes =
-	{ { 0, Vertex::offset_pos(), VK_FORMAT_R32G32B32_SFLOAT },
-	  { 1, Vertex::offset_color(), VK_FORMAT_R32G32B32A32_SFLOAT } };
+	{ { 0, Vertex::offset_pos(), VK_FORMAT_R32G32B32_SFLOAT } };
 
 	std::vector<VkDescriptorSetLayout> descriptor_layouts;
-
-	// add constants for every stage
-	// look at pSpecializationInfo here: https://registry.khronos.org/vulkan/specs/1.3-extensions/man/html/VkPipelineShaderStageCreateInfo.html
-
-	std::optional<std::string> tesselation_shader_path;
-	std::optional<std::string> geometry_shader_path;
     };
 
     struct RenderPassSettings
@@ -124,10 +116,9 @@ namespace rndrboi
 	VkSharingMode sharing_mode	= VK_SHARING_MODE_EXCLUSIVE;
     };
 
-    struct DescriptorSetSettings
+    struct ImageBufferSettings
     {
-	uint32_t binding = 0;
-	//stage here
-	
+	VkImageCreateInfo create_info;
     };
+
 };

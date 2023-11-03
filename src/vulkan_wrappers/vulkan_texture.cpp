@@ -66,6 +66,8 @@ void VulkanTexture::load( std::string path )
     image_info.samples = VK_SAMPLE_COUNT_1_BIT;
     image_info.flags = 0;
 
+
+    image = BufferManager::Instance()->get_image_buffer({ .create_info = image_info });
 }
 
 void VulkanTexture::clean()
