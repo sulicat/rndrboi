@@ -49,8 +49,6 @@ MESH_ID AssetManager::add_cube()
     MESH_ID mesh_id = add_mesh();
     Mesh& mesh = get_mesh( mesh_id );
 
-    // fill in vertex info based on baked in cube
-
     int vert_size = 8;
     int vert_count = CUBE_VERT_SIZE / vert_size;
     mesh.vertex_data.resize( vert_count );

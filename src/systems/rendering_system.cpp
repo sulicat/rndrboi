@@ -29,17 +29,6 @@ RenderingSystem* RenderingSystem::Instance()
     return singleton_instance;
 }
 
-const std::vector<Vertex> triangle_verts = {
-    { .pos = {-0.5f, -0.5f, 0.0f}, .color = {1.0f, 0.0f, 0.0f, 1.0f} },
-    { .pos = { 0.5f, -0.5f, 0.0f}, .color = {0.0f, 1.0f, 0.0f, 1.0f} },
-    { .pos = { 0.5f,  0.5f, 0.0f}, .color = {0.0f, 0.0f, 0.0f, 1.0f} },
-    { .pos = {-0.5f,  0.5f, 0.0f}, .color = {0.0f, 1.0f, 1.0f, 1.0f} }
-};
-
-const std::vector<uint16_t> indices = {
-    0,1,2,2,3,0
-};
-
 void RenderingSystem::init()
 {
     std::cout << OK_PRINT << "init\n";
@@ -98,7 +87,6 @@ void RenderingSystem::init()
     // create a vertex buffer
     index_buffer = BufferManager::Instance()->get_buffer({ .usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT });
     void* index_buff_ptr = BufferManager::Instance()->get_mapped_memory( index_buffer );
-    memcpy( index_buff_ptr, indices.data(), indices.size() * sizeof(uint16_t));
 
 
     framebuffer.create( device_data, swapchain, render_pass );
