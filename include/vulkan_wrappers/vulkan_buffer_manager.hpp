@@ -21,12 +21,47 @@ namespace rndrboi
 
     private:
 
-	Buffer( VkBuffer buffer_in, VmaAllocation alloc_in, uint32_t size_in )
+	Buffer( uint32_t size_in )
+	{
+	    set( size_in );
+	}
+
+	void set( uint32_t size_in )
+	{
+	    is_set = true;
+	    size = size_in;
+	}
+
+	bool is_set		= false;
+	void* mapped_memory	= nullptr;
+	bool is_mapped		= false;
+	uint32_t size = 0;
+
+	// only yhr buffer manager can crate a Buffer that is markeg "good"
+	friend class BufferManager;
+    };
+
+    //----------------------------------------------------------------------------------------------------
+    /*
+    class ImageBuffer
+    {
+    public:
+
+	ImageBuffer(){}
+	bool is_good() { return is_set; }
+	uint32_t get_size() { return size; }
+
+	VkImage image;
+	VmaAllocation allocation;
+
+    private:
+
+	ImageBuffer( uint32_t size_in )
 	{
 	    set( buffer_in, alloc_in, size_in );
 	}
 
-	void set( VkBuffer buffer_in, VmaAllocation alloc_in, uint32_t size_in )
+	void set( uint32_t size_in )
 	{
 	    buffer = buffer_in;
 	    allocation = alloc_in;
@@ -42,7 +77,7 @@ namespace rndrboi
 	// only yhr buffer manager can crate a Buffer that is markeg "good"
 	friend class BufferManager;
     };
-
+    */
     //----------------------------------------------------------------------------------------------------
 
     struct StagingBufferPair{
@@ -59,7 +94,7 @@ namespace rndrboi
 	static BufferManager* Instance();
 
 	void init( VulkanDevice& dev );
-	Buffer get_buffer( BufferSettings settings );
+	Buffer* get_buffer( BufferSettings settings );
 	StagingBufferPair get_staing_buffer_pair( int size, VkBufferUsageFlags usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT  );
 	void* get_mapped_memory( Buffer& buff );
 
@@ -71,6 +106,8 @@ namespace rndrboi
 	VulkanDevice* internal_device;
 	bool is_initialized = false;
 	static BufferManager* instance;
+
+	std::vector<Buffer*> all_buffers;
 
     };
 

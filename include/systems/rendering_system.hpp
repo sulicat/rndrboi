@@ -15,6 +15,7 @@
 #include "vulkan_wrappers/vulkan_buffer_manager.hpp"
 #include "vulkan_wrappers/vulkan_uniform_manager.hpp"
 #include <vulkan/vulkan.h>
+#include "vulkan_wrappers/vulkan_texture.hpp"
 
 #include "mesh.hpp"
 
@@ -60,9 +61,12 @@ namespace rndrboi
 	UniformModelViewProjection model_view_projection;
 	void* model_view_projection_ptr;
 
-	rndrboi::Buffer vertex_buffer;
-	rndrboi::Buffer index_buffer;
+	rndrboi::Buffer* vertex_buffer;
+	rndrboi::Buffer* index_buffer;
 	void* vertex_buff_ptr;
+
+	// test texture
+	rndrboi::VulkanTexture wood_texture;
 
 	static RenderingSystem* singleton_instance;
 

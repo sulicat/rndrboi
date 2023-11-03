@@ -67,7 +67,7 @@ void UniformManager::done()
 	Uniform* uni = uniforms[i];
 
 	VkDescriptorBufferInfo buffer_info{};
-	buffer_info.buffer	= uni->buffer.buffer;
+	buffer_info.buffer	= uni->buffer->buffer;
 	buffer_info.offset	= 0;
 	buffer_info.range	= uni->size;
 
@@ -134,7 +134,6 @@ void UniformManager::clean()
     {
 	std::cout << OK_PRINT << " Cleaned uniform: " << uni->name << "\n";
 
-	BufferManager::Instance()->clean_buffer(uni->buffer);
 	delete uni;
     }
 

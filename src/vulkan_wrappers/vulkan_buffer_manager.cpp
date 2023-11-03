@@ -44,7 +44,7 @@ void BufferManager::init( VulkanDevice& dev )
     is_initialized = true;
 }
 
-Buffer BufferManager::get_buffer( BufferSettings settings )
+Buffer* BufferManager::get_buffer( BufferSettings settings )
 {
     if( !is_initialized )
 	std::cout << BAD_PRINT << "ERROR Need to call init( dev ) on buffer manager\n";
@@ -59,20 +59,20 @@ Buffer BufferManager::get_buffer( BufferSettings settings )
     alloc_info.usage = VMA_MEMORY_USAGE_AUTO;
     alloc_info.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT; // host accesible
 
-    VkBuffer buffer;
-    VmaAllocation allocation;
-    Buffer buffer_out( buffer, allocation, settings.buffer_size );
+    Buffer* buffer_out = new Buffer( settings.buffer_size );
 
     VkResult res = vmaCreateBuffer( allocator,
 				    &buffer_create_info,
 				    &alloc_info,
-				    &buffer_out.buffer,
-				    &buffer_out.allocation,
+				    &buffer_out->buffer,
+				    &buffer_out->allocation,
 				    nullptr );
     if( res != VK_SUCCESS )
 	std::cout << BAD_PRINT << "ERROR could not create buffer of size: " << buffer_create_info.size << "\n";
 
-    return std::move( buffer_out );
+    all_buffers.push_back( buffer_out );
+
+    return buffer_out;
 }
 
 void* BufferManager::get_mapped_memory( Buffer& buff )
@@ -99,6 +99,10 @@ void BufferManager::clean_buffer( Buffer& buff )
 
 void BufferManager::clean()
 {
+
+    for( int i = 0; i < all_buffers.size(); i++ )
+	clean_buffer( *all_buffers[i] );
+
     vmaDestroyAllocator(allocator);
 }
 

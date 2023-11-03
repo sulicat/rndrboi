@@ -18,7 +18,7 @@ namespace rndrboi
 	int size;
 	int bind_point;
 	std::string name;
-	rndrboi::Buffer buffer;
+	rndrboi::Buffer* buffer;
     };
 
     class UniformManager
@@ -37,7 +37,7 @@ namespace rndrboi
 
 	    // create a buffer to map for this uniform
 	    out->buffer = BufferManager::Instance()->get_buffer( { .usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT } );
-	    out->data_ptr = BufferManager::Instance()->get_mapped_memory( out->buffer );
+	    out->data_ptr = BufferManager::Instance()->get_mapped_memory( *out->buffer );
 
 	    std::cout << OK_PRINT_UM << "Created uniform: " << name << "\n";
 

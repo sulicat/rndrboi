@@ -99,18 +99,17 @@ void CommandManager::begin_render_pass( RenderPass& render_pass,
 
 }
 
-void CommandManager::bind_vertex_buffer( Buffer& buff )
+void CommandManager::bind_vertex_buffer( Buffer* buff )
 {
-    VkBuffer buffers[] = {buff.buffer};
+    VkBuffer buffers[] = {buff->buffer};
     VkDeviceSize offsets[] = {0};
     vkCmdBindVertexBuffers(command_buffer, 0, 1, buffers, offsets);
 }
 
-void CommandManager::bind_index_buffer( Buffer& buff )
+void CommandManager::bind_index_buffer( Buffer* buff )
 {
-    vkCmdBindIndexBuffer(command_buffer, buff.buffer, 0, VK_INDEX_TYPE_UINT16);
+    vkCmdBindIndexBuffer(command_buffer, buff->buffer, 0, VK_INDEX_TYPE_UINT16);
 }
-
 
 void CommandManager::bind_descriptor_sets( GraphicsPipeline& pipeline,
 					   std::vector<UniformManager*> uniform_managers)
@@ -150,7 +149,6 @@ void CommandManager::draw( GraphicsPipeline& pipeline,
     else
 	vkCmdDraw ( command_buffer, vert_count, 1, 0, 0 );
 }
-
 
 void CommandManager::submit( Semaphore& wait_sem, Semaphore signal_sem, Fence completion_fence )
 {

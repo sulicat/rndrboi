@@ -57,10 +57,13 @@ void RenderingSystem::init()
 
     BufferManager::Instance()->init( device_data );
 
-    // model view projection
+    // uniforms
     uniform_manager.create( device_data );
+
+    // model view projection
     Uniform* uniform_mvp = uniform_manager.add_uniform<UniformModelViewProjection>("model_view_projection", 0);
     model_view_projection_ptr = uniform_mvp->data_ptr;
+
     uniform_manager.done();
 
     // pipelines
@@ -79,14 +82,16 @@ void RenderingSystem::init()
 		     });
 
     // create a vertex buffer
-    vertex_buffer = BufferManager::Instance()->get_buffer({
-	    .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT
-	});
-    vertex_buff_ptr = BufferManager::Instance()->get_mapped_memory( vertex_buffer );
+    vertex_buffer = BufferManager::Instance()->get_buffer({ .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT });
+    vertex_buff_ptr = BufferManager::Instance()->get_mapped_memory( *vertex_buffer );
 
     // create a vertex buffer
     index_buffer = BufferManager::Instance()->get_buffer({ .usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT });
-    void* index_buff_ptr = BufferManager::Instance()->get_mapped_memory( index_buffer );
+    void* index_buff_ptr = BufferManager::Instance()->get_mapped_memory( *index_buffer );
+
+    // test texture
+    wood_texture.create( device_data );
+    wood_texture.load( "resources/textures/wood_light.jpg" );
 
 
     framebuffer.create( device_data, swapchain, render_pass );
@@ -181,9 +186,6 @@ void RenderingSystem::cleanup()
     VulkanDeviceInit::wait_idle( device_data );
 
     uniform_manager.clean();
-
-    BufferManager::Instance()->clean_buffer(index_buffer);
-    BufferManager::Instance()->clean_buffer(vertex_buffer);
 
     sem_image_available.clean();
     sem_render_finished.clean();

@@ -35,9 +35,9 @@ namespace rndrboi
 
 	void end_render_pass();
 
-	void bind_vertex_buffer( Buffer& buff );
+	void bind_vertex_buffer( Buffer* buff );
 
-	void bind_index_buffer( Buffer& buff );
+	void bind_index_buffer( Buffer* buff );
 
 	void bind_descriptor_sets( GraphicsPipeline& pipeline,
 				   std::vector<UniformManager*> uniform_managers );
