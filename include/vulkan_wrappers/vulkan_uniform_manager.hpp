@@ -2,6 +2,7 @@
 
 #include "vulkan_wrappers/vulkan_types.hpp"
 #include "vulkan_wrappers/vulkan_buffer_manager.hpp"
+#include "vulkan_wrappers/vulkan_texture.hpp"
 #include <vulkan/vulkan.hpp>
 
 #include "utils.hpp"
@@ -20,6 +21,14 @@ namespace rndrboi
 	std::string name;
 	rndrboi::Buffer* buffer;
     };
+
+    struct Sampler
+    {
+	int bind_point;
+	VkSampler sampler;
+	VkImageView image_view;
+    };
+
 
     class UniformManager
     {
@@ -46,6 +55,9 @@ namespace rndrboi
 	    return uniforms[uniforms.size()-1];
 	}
 
+	Sampler* add_sampler( int bind_point_in, VkImageView image_view_in );
+	Sampler* add_dummy_sampler( int bind_point_in );
+
 	VkDescriptorSetLayout new_layout();
 	VkDescriptorSetLayout get_layout();
 	void done();
@@ -57,8 +69,14 @@ namespace rndrboi
 	uint32_t descriptor_set_binding;
 
     private:
+	void create_dummy_texture();
+
 	VulkanDevice* internal_device;
 	std::vector<Uniform*> uniforms;
+	std::vector<Sampler*> samplers;
+
+	bool dummy_texture_created = false;
+	rndrboi::VulkanTexture dummy_texture;
     };
 
 };

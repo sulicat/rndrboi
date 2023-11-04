@@ -27,6 +27,7 @@ int main( int argc, char** argv )
     uint32_t susanne = scene.create_entity();
     scene.add_component<rndrboi::components::Renderable>	(susanne);
     scene.add_component<rndrboi::components::Mesh>		(susanne, "resources/susanne.obj");
+    //scene.add_component<rndrboi::components::Material>		(susanne);
     scene.add_component<rndrboi::components::Transform>		(susanne);
 
     /*

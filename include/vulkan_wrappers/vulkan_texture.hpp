@@ -15,6 +15,7 @@ namespace rndrboi
 	VulkanTexture();
 	void create( VulkanDevice& dev );
 	void load( std::string path );
+	void from_data( char* data, int w_in, int h_in, int ch_in );
 	void clean();
 
 	int width = 0;
@@ -26,6 +27,7 @@ namespace rndrboi
 	void* staging_buffer_ptr = NULL;
 
 	rndrboi::ImageBuffer* image;
+	VkImageView image_view;
 
     private:
 	bool init_success = false;

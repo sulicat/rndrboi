@@ -59,12 +59,19 @@ void RenderingSystem::init()
 
     // uniforms
     uniform_manager.create( device_data );
-
-    // model view projection
     Uniform* uniform_mvp = uniform_manager.add_uniform<UniformModelViewProjection>("model_view_projection", 0);
     model_view_projection_ptr = uniform_mvp->data_ptr;
-
     uniform_manager.done();
+
+    // 5 dummy textures
+    sampler_manager.create( device_data );
+    sampler_manager.add_dummy_sampler( 0 );
+    sampler_manager.add_dummy_sampler( 1 );
+    sampler_manager.add_dummy_sampler( 2 );
+    sampler_manager.add_dummy_sampler( 3 );
+    sampler_manager.add_dummy_sampler( 4 );
+    sampler_manager.done();
+
 
     // pipelines
     pipeline.create( device_data,
@@ -72,13 +79,19 @@ void RenderingSystem::init()
 		     {
 			 .vert_shader_path	= "./compiled_shaders/shader.vert.spv",
 			 .frag_shader_path	= "./compiled_shaders/shader.frag.spv",
+
 			 .viewport_width	= (float)swapchain.width(),
 			 .viewport_height	= (float)swapchain.height(),
+
 			 .shader_attributes	= { { 0, Vertex::offset_pos(), VK_FORMAT_R32G32B32_SFLOAT },
 						    { 1, Vertex::offset_normal(), VK_FORMAT_R32G32B32_SFLOAT },
 						    { 2, Vertex::offset_uv(), VK_FORMAT_R32G32_SFLOAT },
 						    { 3, Vertex::offset_color(), VK_FORMAT_R32G32B32A32_SFLOAT } },
-			 .descriptor_layouts	= { uniform_manager.get_layout() },
+
+			 .descriptor_layouts	= {
+			     uniform_manager.get_layout()
+			 },
+
 		     });
 
     // create a vertex buffer
@@ -88,11 +101,6 @@ void RenderingSystem::init()
     // create a vertex buffer
     index_buffer = BufferManager::Instance()->get_buffer({ .usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT });
     void* index_buff_ptr = BufferManager::Instance()->get_mapped_memory( *index_buffer );
-
-    // test texture
-    wood_texture.create( device_data );
-    wood_texture.load( "resources/textures/wood_light.jpg" );
-
 
     framebuffer.create( device_data, swapchain, render_pass );
 
@@ -151,7 +159,6 @@ void RenderingSystem::step( Scene& scene )
 		&model_view_projection,
 		sizeof(UniformModelViewProjection) );
 
-
 	command_manager.draw( pipeline,
 			      swapchain,
 			      { &uniform_manager },
@@ -186,6 +193,7 @@ void RenderingSystem::cleanup()
     VulkanDeviceInit::wait_idle( device_data );
 
     uniform_manager.clean();
+    sampler_manager.clean();
 
     sem_image_available.clean();
     sem_render_finished.clean();

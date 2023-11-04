@@ -58,15 +58,14 @@ namespace rndrboi
 	rndrboi::Fence fence_frame_in_flight;
 
 	rndrboi::UniformManager uniform_manager;
+	rndrboi::UniformManager sampler_manager;
+
 	UniformModelViewProjection model_view_projection;
 	void* model_view_projection_ptr;
 
 	rndrboi::Buffer* vertex_buffer;
 	rndrboi::Buffer* index_buffer;
 	void* vertex_buff_ptr;
-
-	// test texture
-	rndrboi::VulkanTexture wood_texture;
 
 	static RenderingSystem* singleton_instance;
 

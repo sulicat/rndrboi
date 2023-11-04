@@ -32,11 +32,6 @@ void VulkanTexture::load( std::string path )
 				&stb_width, &stb_height, &stb_channels,
 				STBI_rgb_alpha);
 
-    width = stb_width;
-    height = stb_height;
-    channels = 4; // forced alpha channel via stbi load
-    image_size = width*height*channels;
-
     std::cout << OK_PRINT << stb_width << "x" << stb_height << " " << stb_channels << " channels\n";
 
     if( !pixels )
@@ -45,11 +40,23 @@ void VulkanTexture::load( std::string path )
 	return;
     }
 
+    from_data( (char*)pixels, stb_width, stb_height, 4 ); // forced alpha channel via stbi load
+
+    stbi_image_free(pixels);
+}
+
+
+void VulkanTexture::from_data( char* data, int w_in, int h_in, int ch_in )
+{
+
+    width = w_in;
+    height = h_in;
+    channels = ch_in;
+    image_size = width*height*channels;
 
     staging_buffer = BufferManager::Instance()->get_buffer({ .usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT });
     staging_buffer_ptr = BufferManager::Instance()->get_mapped_memory( *staging_buffer );
-    memcpy(staging_buffer_ptr, pixels, image_size );
-    stbi_image_free(pixels);
+    memcpy(staging_buffer_ptr, data, image_size );
 
     VkImageCreateInfo image_info{};
     image_info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -66,10 +73,31 @@ void VulkanTexture::load( std::string path )
     image_info.samples = VK_SAMPLE_COUNT_1_BIT;
     image_info.flags = 0;
 
-
     image = BufferManager::Instance()->get_image_buffer({ .create_info = image_info });
+
+    VkImageViewCreateInfo view_info{};
+    view_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+    view_info.image = image->image;
+    view_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
+    view_info.format = VK_FORMAT_R8G8B8A8_SRGB;
+    view_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    view_info.subresourceRange.baseMipLevel = 0;
+    view_info.subresourceRange.levelCount = 1;
+    view_info.subresourceRange.baseArrayLayer = 0;
+    view_info.subresourceRange.layerCount = 1;
+
+    VkResult res = vkCreateImageView( internal_device->logical_device,
+				      &view_info,
+				      nullptr,
+				      &image_view );
+
+    if( res != VK_SUCCESS )
+	std::cout << BAD_PRINT << "Could not create image view\n";
 }
 
 void VulkanTexture::clean()
 {
+    vkDestroyImageView( internal_device->logical_device,
+			image_view,
+			nullptr );
 }

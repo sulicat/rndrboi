@@ -46,6 +46,7 @@ namespace rndrboi
 	QueFamilyInfo			 queue_fam_info;
 	VkQueue				 graphics_queue;
 	VkQueue				 present_queue;
+	float                            max_anisotropy;
 
     };
 

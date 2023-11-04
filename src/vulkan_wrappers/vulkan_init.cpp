@@ -119,6 +119,7 @@ void VulkanDeviceInit::choose_physical_device( VulkanDevice& dev_out, const Vulk
 
 	    SwapChainSupportInfo swap_chain_info = get_swapchain_support_info( dev, dev_out.surface );
 	    dev_out.physical_device = dev;
+	    dev_out.max_anisotropy = props.limits.maxSamplerAnisotropy;
 	    dev_out.swapchain_info = swap_chain_info;
 	    return;
 	}
@@ -335,6 +336,7 @@ void VulkanDeviceInit::create_logical_device( VulkanDevice& dev, const VulkanDev
     }
 
     VkPhysicalDeviceFeatures device_features{};
+    device_features.samplerAnisotropy = VK_TRUE;
 
     VkDeviceCreateInfo create_info{};
     create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -342,6 +344,8 @@ void VulkanDeviceInit::create_logical_device( VulkanDevice& dev, const VulkanDev
     create_info.queueCreateInfoCount = queue_create_infos.size();
     create_info.enabledExtensionCount = device_extensions.size();
     create_info.ppEnabledExtensionNames = device_extensions.data();
+    create_info.pEnabledFeatures = &device_features;
+
 
 
     dev.queue_fam_info = selected_q_fam;
