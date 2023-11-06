@@ -45,7 +45,7 @@ void RenderPass::create( VulkanDevice& dev, RenderPassSettings settings )
 
     VkResult res = vkCreateRenderPass( dev.logical_device, &render_pass_create_info, nullptr, &render_pass );
     if( res != VK_SUCCESS )
-    std::cout << BAD_PRINT << "ERROR Could not create renderpass\n";
+        std::cout << BAD_PRINT << "ERROR Could not create renderpass\n";
 
 }
 

@@ -16,47 +16,47 @@ namespace rndrboi
     class CommandManager
     {
     public:
-    CommandManager();
+        CommandManager();
 
-    void create( VulkanDevice& dev, CommandManagerSettings settings );
+        void create( VulkanDevice& dev, CommandManagerSettings settings );
 
-    void clean();
+        void clean();
 
-    void reset();
+        void reset();
 
-    void begin_recording();
+        void begin_recording();
 
-    void end_recording();
+        void end_recording();
 
-    void begin_render_pass( RenderPass& render_pass,
-                Swapchain& swapchain,
-                Framebuffer& framebuffer,
-                int image_index );
+        void begin_render_pass( RenderPass& render_pass,
+                                Swapchain& swapchain,
+                                Framebuffer& framebuffer,
+                                int image_index );
 
-    void end_render_pass();
+        void end_render_pass();
 
-    void bind_vertex_buffer( Buffer* buff );
+        void bind_vertex_buffer( Buffer* buff );
 
-    void bind_index_buffer( Buffer* buff );
+        void bind_index_buffer( Buffer* buff );
 
-    void bind_descriptor_sets( GraphicsPipeline& pipeline,
-                   std::vector<UniformManager*> uniform_managers );
+        void bind_descriptor_sets( GraphicsPipeline& pipeline,
+                                   std::vector<UniformManager*> uniform_managers );
 
-    void draw( GraphicsPipeline& pipeline,
-           Swapchain& swapchain,
-           std::vector<UniformManager*> uniform_managers,
-           int vert_count,
-           bool is_indexed );
+        void draw( GraphicsPipeline& pipeline,
+                   Swapchain& swapchain,
+                   std::vector<UniformManager*> uniform_managers,
+                   int vert_count,
+                   bool is_indexed );
 
-    void submit( Semaphore& wait_sem, Semaphore signal_sem, Fence completion_fence );
+        void submit( Semaphore& wait_sem, Semaphore signal_sem, Fence completion_fence );
 
-    void present( Swapchain& swapchain, uint32_t image_index, Semaphore& wait_sem );
+        void present( Swapchain& swapchain, uint32_t image_index, Semaphore& wait_sem );
 
-    VkCommandPool command_pool;
-    VkCommandBuffer command_buffer;
+        VkCommandPool command_pool;
+        VkCommandBuffer command_buffer;
 
     private:
-    VulkanDevice* internal_dev;
+        VulkanDevice* internal_dev;
 
     };
 }

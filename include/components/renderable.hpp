@@ -2,7 +2,7 @@ namespace rndrboi::components
 {
     struct Renderable
     {
-    bool is_visible;
+        bool is_visible;
     };
 
 };

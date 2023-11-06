@@ -19,8 +19,8 @@ BufferManager* BufferManager::instance = NULL;
 BufferManager* BufferManager::Instance()
 {
     if (!instance){
-    std::cout << OK_PRINT << "Created Buffer Manager\n";
-    instance = new BufferManager;
+        std::cout << OK_PRINT << "Created Buffer Manager\n";
+        instance = new BufferManager;
     }
     return instance;
 }
@@ -39,7 +39,7 @@ void BufferManager::init( VulkanDevice& dev )
 
     VkResult res = vmaCreateAllocator( &allocator_create_info, &allocator );
     if( res != VK_SUCCESS )
-    std::cout << BAD_PRINT << "ERROR could not create memory allocator\n";
+        std::cout << BAD_PRINT << "ERROR could not create memory allocator\n";
 
     is_initialized = true;
 }
@@ -47,7 +47,7 @@ void BufferManager::init( VulkanDevice& dev )
 Buffer* BufferManager::get_buffer( BufferSettings settings )
 {
     if( !is_initialized )
-    std::cout << BAD_PRINT << "ERROR Need to call init( dev ) on buffer manager\n";
+        std::cout << BAD_PRINT << "ERROR Need to call init( dev ) on buffer manager\n";
 
     VkBufferCreateInfo buffer_create_info{};
     buffer_create_info.sType        = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -62,13 +62,13 @@ Buffer* BufferManager::get_buffer( BufferSettings settings )
     Buffer* buffer_out = new Buffer( settings.buffer_size );
 
     VkResult res = vmaCreateBuffer( allocator,
-                    &buffer_create_info,
-                    &alloc_info,
-                    &buffer_out->buffer,
-                    &buffer_out->allocation,
-                    nullptr );
+                                    &buffer_create_info,
+                                    &alloc_info,
+                                    &buffer_out->buffer,
+                                    &buffer_out->allocation,
+                                    nullptr );
     if( res != VK_SUCCESS )
-    std::cout << BAD_PRINT << "ERROR could not create buffer of size: " << buffer_create_info.size << "\n";
+        std::cout << BAD_PRINT << "ERROR could not create buffer of size: " << buffer_create_info.size << "\n";
 
     all_buffers.push_back( buffer_out );
 
@@ -78,7 +78,7 @@ Buffer* BufferManager::get_buffer( BufferSettings settings )
 ImageBuffer* BufferManager::get_image_buffer( ImageBufferSettings settings )
 {
     if( !is_initialized )
-    std::cout << BAD_PRINT << "ERROR Need to call init( dev ) on buffer manager\n";
+        std::cout << BAD_PRINT << "ERROR Need to call init( dev ) on buffer manager\n";
 
     ImageBuffer* image_out = new ImageBuffer();
 
@@ -87,14 +87,14 @@ ImageBuffer* BufferManager::get_image_buffer( ImageBufferSettings settings )
     alloc_info.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT; // host accesible
 
     VkResult res = vmaCreateImage( allocator,
-                   &settings.create_info,
-                   &alloc_info,
-                   &image_out->image,
-                   &image_out->allocation,
-                   nullptr );
+                                   &settings.create_info,
+                                   &alloc_info,
+                                   &image_out->image,
+                                   &image_out->allocation,
+                                   nullptr );
 
     if( res != VK_SUCCESS )
-    std::cout << BAD_PRINT << "ERROR could not create image\n";
+        std::cout << BAD_PRINT << "ERROR could not create image\n";
 
     all_image_buffers.push_back( image_out );
 
@@ -105,12 +105,12 @@ ImageBuffer* BufferManager::get_image_buffer( ImageBufferSettings settings )
 void* BufferManager::get_mapped_memory( Buffer& buff )
 {
     if( !buff.is_good() )
-    std::cout << BAD_PRINT << "ERROR buffer memory mapping failed. Buffer not initialized properly\n";
+        std::cout << BAD_PRINT << "ERROR buffer memory mapping failed. Buffer not initialized properly\n";
 
     if( !buff.is_mapped )
     {
-    vmaMapMemory(allocator, buff.allocation, &buff.mapped_memory);
-    buff.is_mapped = true;
+        vmaMapMemory(allocator, buff.allocation, &buff.mapped_memory);
+        buff.is_mapped = true;
     }
 
     return buff.mapped_memory;
@@ -119,12 +119,12 @@ void* BufferManager::get_mapped_memory( Buffer& buff )
 void* BufferManager::get_mapped_memory( ImageBuffer& buff )
 {
     if( !buff.is_good() )
-    std::cout << BAD_PRINT << "ERROR image memory mapping failed. Image Buffer not initialized properly\n";
+        std::cout << BAD_PRINT << "ERROR image memory mapping failed. Image Buffer not initialized properly\n";
 
     if( !buff.is_mapped )
     {
-    vmaMapMemory(allocator, buff.allocation, &buff.mapped_memory);
-    buff.is_mapped = true;
+        vmaMapMemory(allocator, buff.allocation, &buff.mapped_memory);
+        buff.is_mapped = true;
     }
 
     return buff.mapped_memory;
@@ -134,7 +134,7 @@ void* BufferManager::get_mapped_memory( ImageBuffer& buff )
 void BufferManager::clean_buffer( Buffer& buff )
 {
     if( buff.is_mapped )
-    vmaUnmapMemory(allocator, buff.allocation);
+        vmaUnmapMemory(allocator, buff.allocation);
 
     vmaDestroyBuffer(allocator, buff.buffer, buff.allocation);
 }
@@ -142,7 +142,7 @@ void BufferManager::clean_buffer( Buffer& buff )
 void BufferManager::clean_buffer( ImageBuffer& buff )
 {
     if( buff.is_mapped )
-    vmaUnmapMemory(allocator, buff.allocation);
+        vmaUnmapMemory(allocator, buff.allocation);
 
     vmaDestroyImage(allocator, buff.image, buff.allocation);
 }
@@ -151,10 +151,10 @@ void BufferManager::clean()
 {
 
     for( int i = 0; i < all_image_buffers.size(); i++ )
-    clean_buffer( *all_image_buffers[i] );
+        clean_buffer( *all_image_buffers[i] );
 
     for( int i = 0; i < all_buffers.size(); i++ )
-    clean_buffer( *all_buffers[i] );
+        clean_buffer( *all_buffers[i] );
 
     vmaDestroyAllocator(allocator);
 }

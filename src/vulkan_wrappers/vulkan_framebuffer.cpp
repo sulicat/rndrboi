@@ -23,21 +23,21 @@ void Framebuffer::create( VulkanDevice& dev, Swapchain& swapchain, RenderPass& r
 
     for( int i = 0; i < swapchain.image_views.size(); i++ )
     {
-    VkImageView attachments[] = { swapchain.image_views[i] };
+        VkImageView attachments[] = { swapchain.image_views[i] };
 
-    VkFramebufferCreateInfo framebuffer_create_info{};
-    framebuffer_create_info.sType       = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-    framebuffer_create_info.renderPass  = render_pass.render_pass;
-    framebuffer_create_info.attachmentCount = 1;
-    framebuffer_create_info.pAttachments    = attachments;
-    framebuffer_create_info.width       = swapchain.width();
-    framebuffer_create_info.height      = swapchain.height();
-    framebuffer_create_info.layers      = 1;
+        VkFramebufferCreateInfo framebuffer_create_info{};
+        framebuffer_create_info.sType       = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+        framebuffer_create_info.renderPass  = render_pass.render_pass;
+        framebuffer_create_info.attachmentCount = 1;
+        framebuffer_create_info.pAttachments    = attachments;
+        framebuffer_create_info.width       = swapchain.width();
+        framebuffer_create_info.height      = swapchain.height();
+        framebuffer_create_info.layers      = 1;
 
-    VkResult res = vkCreateFramebuffer( dev.logical_device, &framebuffer_create_info, nullptr, &swapchain_framebuffers[i] );
+        VkResult res = vkCreateFramebuffer( dev.logical_device, &framebuffer_create_info, nullptr, &swapchain_framebuffers[i] );
 
-    if( res != VK_SUCCESS )
-        std::cout << BAD_PRINT << "ERROR: could not create framebuffer\n";
+        if( res != VK_SUCCESS )
+            std::cout << BAD_PRINT << "ERROR: could not create framebuffer\n";
 
     }
 }
@@ -45,5 +45,5 @@ void Framebuffer::create( VulkanDevice& dev, Swapchain& swapchain, RenderPass& r
 void Framebuffer::clean()
 {
     for( auto f : swapchain_framebuffers )
-    vkDestroyFramebuffer( internal_dev->logical_device, f, nullptr );
+        vkDestroyFramebuffer( internal_dev->logical_device, f, nullptr );
 }

@@ -24,53 +24,53 @@ namespace rndrboi
     namespace utils
     {
 
-    // print a c list
-    void print_string_list( std::string prefix, char** list, int count, std::string suffix );
+        // print a c list
+        void print_string_list( std::string prefix, char** list, int count, std::string suffix );
 
-    // convert a list to a vector
-    template <typename T>
-    std::vector<T> list_to_vec( T* list, int count )
-    {
-        std::vector<T> out;
-        for( int i = 0; i < count; i++ )
+        // convert a list to a vector
+        template <typename T>
+        std::vector<T> list_to_vec( T* list, int count )
         {
-        out.push_back( list[i] );
-        }
-        return out;
-    }
-
-
-    template <typename IN, typename OUT, typename NAME, typename T>
-    std::vector<OUT> member_vec( std::vector<T> input )
-    {
-        std::vector<OUT> out( input.size() );
-        for( auto x : input )
-        out.push_back( x.NAME );
-
-        return out;
-    }
-
-    template <typename T>
-    void print_vec( std::vector<T> in, std::string prefix = "", std::string suffix = "" )
-    {
-        for( auto x : in )
-        std::cout << prefix << x << suffix << "\n";
-    }
-
-
-    template <typename T>
-    void print_iter( T in, std::string prefix = "", std::string suffix = "" )
-    {
-        std::cout << prefix << "{ ";
-        for( auto x : in )
-        {
-        std::cout << x << " ";
+            std::vector<T> out;
+            for( int i = 0; i < count; i++ )
+            {
+                out.push_back( list[i] );
+            }
+            return out;
         }
 
-        std::cout << "}\n" << suffix;
-    }
 
-    std::vector<char> read_file(const std::string& filename);
+        template <typename IN, typename OUT, typename NAME, typename T>
+        std::vector<OUT> member_vec( std::vector<T> input )
+        {
+            std::vector<OUT> out( input.size() );
+            for( auto x : input )
+                out.push_back( x.NAME );
+
+            return out;
+        }
+
+        template <typename T>
+        void print_vec( std::vector<T> in, std::string prefix = "", std::string suffix = "" )
+        {
+            for( auto x : in )
+                std::cout << prefix << x << suffix << "\n";
+        }
+
+
+        template <typename T>
+        void print_iter( T in, std::string prefix = "", std::string suffix = "" )
+        {
+            std::cout << prefix << "{ ";
+            for( auto x : in )
+            {
+                std::cout << x << " ";
+            }
+
+            std::cout << "}\n" << suffix;
+        }
+
+        std::vector<char> read_file(const std::string& filename);
 
     }
 }

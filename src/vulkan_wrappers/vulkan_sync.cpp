@@ -20,12 +20,12 @@ void Semaphore::create( VulkanDevice& dev )
     sem_create_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
     VkResult res = vkCreateSemaphore( dev.logical_device,
-                      &sem_create_info,
-                      nullptr,
-                      &vk_sem );
+                                      &sem_create_info,
+                                      nullptr,
+                                      &vk_sem );
 
     if( res != VK_SUCCESS )
-    std::cout << BAD_PRINT << "ERROR could not create semaphore\n";
+        std::cout << BAD_PRINT << "ERROR could not create semaphore\n";
 }
 
 void Semaphore::clean()
@@ -47,15 +47,15 @@ void Fence::create( VulkanDevice& dev, bool is_signaled )
     fence_create_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 
     if (is_signaled)
-    fence_create_info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+        fence_create_info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
     VkResult res = vkCreateFence( dev.logical_device,
-                  &fence_create_info,
-                  nullptr,
-                  &vk_fence );
+                                  &fence_create_info,
+                                  nullptr,
+                                  &vk_fence );
 
     if( res != VK_SUCCESS )
-    std::cout << BAD_PRINT << "ERROR could not create semaphore\n";
+        std::cout << BAD_PRINT << "ERROR could not create semaphore\n";
 }
 
 void Fence::clean()

@@ -25,49 +25,49 @@ namespace rndrboi
 
     struct UniformModelViewProjection
     {
-    glm::mat4 model;
-    glm::mat4 view;
-    glm::mat4 projection;
+        glm::mat4 model;
+        glm::mat4 view;
+        glm::mat4 projection;
     };
 
     class RenderingSystem
     {
     public:
 
-    void init();
-    void step( Scene& scene );
-    void cleanup();
+        void init();
+        void step( Scene& scene );
+        void cleanup();
 
-    static RenderingSystem* Instance();
+        static RenderingSystem* Instance();
 
     private:
 
-    RenderingSystem(){}
-    ~RenderingSystem(){ cleanup(); }
-    void recreate_swapchain();
+        RenderingSystem(){}
+        ~RenderingSystem(){ cleanup(); }
+        void recreate_swapchain();
 
-    rndrboi::VulkanDevice device_data;
-    rndrboi::Swapchain swapchain;
-    rndrboi::RenderPass render_pass;
-    rndrboi::GraphicsPipeline pipeline;
-    rndrboi::Framebuffer framebuffer;
-    rndrboi::CommandManager command_manager;
+        rndrboi::VulkanDevice device_data;
+        rndrboi::Swapchain swapchain;
+        rndrboi::RenderPass render_pass;
+        rndrboi::GraphicsPipeline pipeline;
+        rndrboi::Framebuffer framebuffer;
+        rndrboi::CommandManager command_manager;
 
-    rndrboi::Semaphore sem_image_available;
-    rndrboi::Semaphore sem_render_finished;
-    rndrboi::Fence fence_frame_in_flight;
+        rndrboi::Semaphore sem_image_available;
+        rndrboi::Semaphore sem_render_finished;
+        rndrboi::Fence fence_frame_in_flight;
 
-    rndrboi::UniformManager uniform_manager;
-    rndrboi::UniformManager sampler_manager;
+        rndrboi::UniformManager uniform_manager;
+        rndrboi::UniformManager sampler_manager;
 
-    UniformModelViewProjection model_view_projection;
-    void* model_view_projection_ptr;
+        UniformModelViewProjection model_view_projection;
+        void* model_view_projection_ptr;
 
-    rndrboi::Buffer* vertex_buffer;
-    rndrboi::Buffer* index_buffer;
-    void* vertex_buff_ptr;
+        rndrboi::Buffer* vertex_buffer;
+        rndrboi::Buffer* index_buffer;
+        void* vertex_buff_ptr;
 
-    static RenderingSystem* singleton_instance;
+        static RenderingSystem* singleton_instance;
 
     };
 

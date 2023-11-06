@@ -13,11 +13,11 @@ namespace rndrboi
     class Mesh
     {
     public:
-    Mesh();
+        Mesh();
 
-    int use_indices = false;
+        int use_indices = false;
 
-    std::vector<Vertex> vertex_data;
+        std::vector<Vertex> vertex_data;
     };
 
 }

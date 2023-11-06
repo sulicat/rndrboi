@@ -23,21 +23,21 @@ void VulkanTexture::load( std::string path )
 {
     if( internal_device == NULL || init_success == false )
     {
-    std::cout << BAD_PRINT << "Texture not initialized properly, cannot load\n";
-    return;
+        std::cout << BAD_PRINT << "Texture not initialized properly, cannot load\n";
+        return;
     }
 
     int stb_width, stb_height, stb_channels;
     stbi_uc* pixels = stbi_load(path.c_str(),
-                &stb_width, &stb_height, &stb_channels,
-                STBI_rgb_alpha);
+                                &stb_width, &stb_height, &stb_channels,
+                                STBI_rgb_alpha);
 
     std::cout << OK_PRINT << stb_width << "x" << stb_height << " " << stb_channels << " channels\n";
 
     if( !pixels )
     {
-    std::cout << BAD_PRINT << "Failed to load: " << path << "\n";
-    return;
+        std::cout << BAD_PRINT << "Failed to load: " << path << "\n";
+        return;
     }
 
     from_data( (char*)pixels, stb_width, stb_height, 4 ); // forced alpha channel via stbi load
@@ -87,17 +87,17 @@ void VulkanTexture::from_data( char* data, int w_in, int h_in, int ch_in )
     view_info.subresourceRange.layerCount = 1;
 
     VkResult res = vkCreateImageView( internal_device->logical_device,
-                      &view_info,
-                      nullptr,
-                      &image_view );
+                                      &view_info,
+                                      nullptr,
+                                      &image_view );
 
     if( res != VK_SUCCESS )
-    std::cout << BAD_PRINT << "Could not create image view\n";
+        std::cout << BAD_PRINT << "Could not create image view\n";
 }
 
 void VulkanTexture::clean()
 {
     vkDestroyImageView( internal_device->logical_device,
-            image_view,
-            nullptr );
+                        image_view,
+                        nullptr );
 }

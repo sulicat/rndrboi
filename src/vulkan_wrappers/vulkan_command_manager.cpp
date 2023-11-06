@@ -23,14 +23,14 @@ void CommandManager::create( VulkanDevice& dev, CommandManagerSettings settings 
     VkResult res = vkCreateCommandPool( dev.logical_device, &pool_create_info, nullptr, &command_pool );
 
     if( res != VK_SUCCESS )
-    std::cout << BAD_PRINT << "ERROR could not create command pool\n";
+        std::cout << BAD_PRINT << "ERROR could not create command pool\n";
 
 
     // create command buffers
     if( settings.num_command_buffers < 1 )
     {
-    std::cout << OK_PRINT << "requested: " << settings.num_command_buffers << " Command buffers... min is 1, creating min\n";
-    settings.num_command_buffers = 1;
+        std::cout << OK_PRINT << "requested: " << settings.num_command_buffers << " Command buffers... min is 1, creating min\n";
+        settings.num_command_buffers = 1;
     }
 
     VkCommandBufferAllocateInfo allocate_info{};
@@ -42,7 +42,7 @@ void CommandManager::create( VulkanDevice& dev, CommandManagerSettings settings 
     res = vkAllocateCommandBuffers( dev.logical_device, &allocate_info, &command_buffer );
 
     if( res != VK_SUCCESS )
-    std::cout << BAD_PRINT << "ERROR Failed to allocate command buffer\n";
+        std::cout << BAD_PRINT << "ERROR Failed to allocate command buffer\n";
 }
 
 void CommandManager::reset()
@@ -61,7 +61,7 @@ void CommandManager::begin_recording()
     VkResult res = vkBeginCommandBuffer( command_buffer, &begin_info );
 
     if( res != VK_SUCCESS )
-    std::cout << BAD_PRINT << "ERROR could not begin recording on buffer\n";
+        std::cout << BAD_PRINT << "ERROR could not begin recording on buffer\n";
 }
 
 
@@ -70,7 +70,7 @@ void CommandManager::end_recording()
 
     VkResult res = vkEndCommandBuffer( command_buffer );
     if( res != VK_SUCCESS )
-    std::cout << BAD_PRINT << "ERROR: Failed to record command buffer\n";
+        std::cout << BAD_PRINT << "ERROR: Failed to record command buffer\n";
 }
 
 void CommandManager::end_render_pass()
@@ -79,9 +79,9 @@ void CommandManager::end_render_pass()
 }
 
 void CommandManager::begin_render_pass( RenderPass& render_pass,
-                    Swapchain& swapchain,
-                    Framebuffer& framebuffer,
-                    int image_index )
+                                        Swapchain& swapchain,
+                                        Framebuffer& framebuffer,
+                                        int image_index )
 {
 
     VkRenderPassBeginInfo render_pass_info{};
@@ -112,32 +112,32 @@ void CommandManager::bind_index_buffer( Buffer* buff )
 }
 
 void CommandManager::bind_descriptor_sets( GraphicsPipeline& pipeline,
-                       std::vector<UniformManager*> uniform_managers)
+                                           std::vector<UniformManager*> uniform_managers)
 
 {
     std::vector<VkDescriptorSet> sets = std::vector<VkDescriptorSet>(uniform_managers.size());
     for( int i = 0; i < uniform_managers.size(); i++ )
-    sets[i] = uniform_managers[i]->descriptor_set;
+        sets[i] = uniform_managers[i]->descriptor_set;
 
     vkCmdBindDescriptorSets( command_buffer,
-                 VK_PIPELINE_BIND_POINT_GRAPHICS,
-                 pipeline.pipeline_layout,
-                 0,
-                 sets.size(),
-                 sets.data(),
-                 0,
-                 nullptr );
+                             VK_PIPELINE_BIND_POINT_GRAPHICS,
+                             pipeline.pipeline_layout,
+                             0,
+                             sets.size(),
+                             sets.data(),
+                             0,
+                             nullptr );
 }
 
 void CommandManager::draw( GraphicsPipeline& pipeline,
-               Swapchain& swapchain,
-               std::vector<UniformManager*> uniform_managers,
-               int vert_count,
-               bool is_indexed )
+                           Swapchain& swapchain,
+                           std::vector<UniformManager*> uniform_managers,
+                           int vert_count,
+                           bool is_indexed )
 {
     vkCmdBindPipeline( command_buffer,
-               VK_PIPELINE_BIND_POINT_GRAPHICS,
-               pipeline.pipeline );
+                       VK_PIPELINE_BIND_POINT_GRAPHICS,
+                       pipeline.pipeline );
 
     vkCmdSetViewport    ( command_buffer, 0, 1, &pipeline.viewport );
     vkCmdSetScissor ( command_buffer, 0, 1, &pipeline.scissor );
@@ -145,9 +145,9 @@ void CommandManager::draw( GraphicsPipeline& pipeline,
     bind_descriptor_sets( pipeline, uniform_managers );
 
     if( is_indexed )
-    vkCmdDrawIndexed ( command_buffer, vert_count, 1, 0, 0, 0 );
+        vkCmdDrawIndexed ( command_buffer, vert_count, 1, 0, 0, 0 );
     else
-    vkCmdDraw ( command_buffer, vert_count, 1, 0, 0 );
+        vkCmdDraw ( command_buffer, vert_count, 1, 0, 0 );
 }
 
 void CommandManager::submit( Semaphore& wait_sem, Semaphore signal_sem, Fence completion_fence )
@@ -172,7 +172,7 @@ void CommandManager::submit( Semaphore& wait_sem, Semaphore signal_sem, Fence co
     VkResult res = vkQueueSubmit( internal_dev->graphics_queue, 1, &submit_info, completion_fence.vk_fence );
 
     if( res != VK_SUCCESS )
-    std::cout << BAD_PRINT << "ERROR could not submit command buffer\n";
+        std::cout << BAD_PRINT << "ERROR could not submit command buffer\n";
 }
 
 void CommandManager::present( Swapchain& swapchain, uint32_t image_index, Semaphore& wait_sem )

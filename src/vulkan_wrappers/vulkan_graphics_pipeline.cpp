@@ -16,7 +16,7 @@ void GraphicsPipeline::create( VulkanDevice& dev, RenderPass& render_pass, Graph
 {
 
     if( settings_in.blend_type != OFF )
-    std::cout << BAD_PRINT << " ONLY BLEND MODE OFF SUPPORTED NOW\n";
+        std::cout << BAD_PRINT << " ONLY BLEND MODE OFF SUPPORTED NOW\n";
 
     settings = settings_in;
     dev_internal = &dev;
@@ -40,8 +40,8 @@ void GraphicsPipeline::create( VulkanDevice& dev, RenderPass& render_pass, Graph
     frag_shader_stage_info.pName    = settings.frag_entrypoint.c_str();
 
     VkPipelineShaderStageCreateInfo shader_stages[] = {
-    vert_shader_stage_info,
-    frag_shader_stage_info
+        vert_shader_stage_info,
+        frag_shader_stage_info
     };
 
     // get the binding description for the vertex we are gonna use
@@ -53,12 +53,12 @@ void GraphicsPipeline::create( VulkanDevice& dev, RenderPass& render_pass, Graph
 
     for( auto& attr : settings.shader_attributes )
     {
-    VkVertexInputAttributeDescription v_attr;
-    v_attr.binding  = 0;
-    v_attr.location = attr.location;
-    v_attr.format   = attr.format;
+        VkVertexInputAttributeDescription v_attr;
+        v_attr.binding  = 0;
+        v_attr.location = attr.location;
+        v_attr.format   = attr.format;
         v_attr.offset   = attr.offset;
-    v_attribute_descr.push_back(v_attr);
+        v_attribute_descr.push_back(v_attr);
     }
 
     // vertex binding here / or instancing here
@@ -131,17 +131,17 @@ void GraphicsPipeline::create( VulkanDevice& dev, RenderPass& render_pass, Graph
 
     if( settings.blend_type == ALPHA_BLEND )
     {
-    color_blend_attachment_create_info.blendEnable      = VK_TRUE;
-    color_blend_attachment_create_info.srcColorBlendFactor  = VK_BLEND_FACTOR_SRC_ALPHA;
-    color_blend_attachment_create_info.dstColorBlendFactor  = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-    color_blend_attachment_create_info.colorBlendOp     = VK_BLEND_OP_ADD;
-    color_blend_attachment_create_info.srcAlphaBlendFactor  = VK_BLEND_FACTOR_ONE;
-    color_blend_attachment_create_info.dstAlphaBlendFactor  = VK_BLEND_FACTOR_ZERO;
-    color_blend_attachment_create_info.alphaBlendOp     = VK_BLEND_OP_ADD;
+        color_blend_attachment_create_info.blendEnable      = VK_TRUE;
+        color_blend_attachment_create_info.srcColorBlendFactor  = VK_BLEND_FACTOR_SRC_ALPHA;
+        color_blend_attachment_create_info.dstColorBlendFactor  = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+        color_blend_attachment_create_info.colorBlendOp     = VK_BLEND_OP_ADD;
+        color_blend_attachment_create_info.srcAlphaBlendFactor  = VK_BLEND_FACTOR_ONE;
+        color_blend_attachment_create_info.dstAlphaBlendFactor  = VK_BLEND_FACTOR_ZERO;
+        color_blend_attachment_create_info.alphaBlendOp     = VK_BLEND_OP_ADD;
     }
     else
     {
-    color_blend_attachment_create_info.blendEnable      = VK_FALSE;
+        color_blend_attachment_create_info.blendEnable      = VK_FALSE;
     }
 
     VkPipelineColorBlendStateCreateInfo color_blend_create_info{};
@@ -164,12 +164,12 @@ void GraphicsPipeline::create( VulkanDevice& dev, RenderPass& render_pass, Graph
     pipeline_layout_create_info.pPushConstantRanges = nullptr;  // Optional
 
     VkResult res = vkCreatePipelineLayout( dev.logical_device,
-                       &pipeline_layout_create_info,
-                       nullptr,
-                       &pipeline_layout );
+                                           &pipeline_layout_create_info,
+                                           nullptr,
+                                           &pipeline_layout );
 
     if( res != VK_SUCCESS )
-    std::cout << BAD_PRINT << "ERROR Could not create pipeline layout\n";
+        std::cout << BAD_PRINT << "ERROR Could not create pipeline layout\n";
 
 
 
@@ -193,16 +193,16 @@ void GraphicsPipeline::create( VulkanDevice& dev, RenderPass& render_pass, Graph
     pipeline_create_info.basePipelineIndex  = -1;
 
     res = vkCreateGraphicsPipelines( dev.logical_device,
-                     VK_NULL_HANDLE,
-                     1,
-                     &pipeline_create_info,
-                     nullptr,
-                     &pipeline);
+                                     VK_NULL_HANDLE,
+                                     1,
+                                     &pipeline_create_info,
+                                     nullptr,
+                                     &pipeline);
 
     if( res != VK_SUCCESS )
-    std::cout << BAD_PRINT << "ERROR Failed creating graphics pipeline\n";
+        std::cout << BAD_PRINT << "ERROR Failed creating graphics pipeline\n";
     else
-    std::cout << OK_PRINT << "Created Graphics Pipline\n";
+        std::cout << OK_PRINT << "Created Graphics Pipline\n";
 
 }
 
@@ -237,7 +237,7 @@ VkShaderModule GraphicsPipeline::create_shader_module( VulkanDevice& dev, std::v
     VkResult res = vkCreateShaderModule(dev.logical_device, &create_info, nullptr, &module);
 
     if( res != VK_SUCCESS )
-    std::cout << BAD_PRINT << "Could not create shader module\n";
+        std::cout << BAD_PRINT << "Could not create shader module\n";
 
     return std::move(module);
 }
