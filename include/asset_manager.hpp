@@ -16,20 +16,20 @@ namespace rndrboi
     {
     public:
 
-	static AssetManager* Instance();
+    static AssetManager* Instance();
 
-	MESH_ID add_mesh();
-	MESH_ID add_cube();
-	Mesh& get_mesh( MESH_ID id );
+    MESH_ID add_mesh();
+    MESH_ID add_cube();
+    Mesh& get_mesh( MESH_ID id );
 
     private:
-	AssetManager();
-	~AssetManager(){}
+    AssetManager();
+    ~AssetManager(){}
 
-	std::vector<Mesh*> meshes;
-	MESH_ID default_mesh;
+    std::vector<Mesh*> meshes;
+    MESH_ID default_mesh;
 
-	static AssetManager* instance;
+    static AssetManager* instance;
     };
 
     // ----------------------------------------------------------------------------------------------------

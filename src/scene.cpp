@@ -22,23 +22,23 @@ Scene::~Scene()
 void Scene::hook_inputs()
 {
     InputSystem::Instance()->register_cb_window_resize( [this]( int w, int h ){
-	std::cout << OK_PRINT << "resize: " << w << " " << h << "\n";
-	camera.set_size( w, h );
+    std::cout << OK_PRINT << "resize: " << w << " " << h << "\n";
+    camera.set_size( w, h );
     });
 
     InputSystem::Instance()->register_cb_mouse_scroll( [this]( double x, double y, float scroll ){
-	camera.zoom( scroll );
+    camera.zoom( scroll );
     });
 
     InputSystem::Instance()->register_cb_mouse_drag( [this]( InputSystem::MouseButton button,
-							     double x, double y,
-							     double dx, double dy,
-							     double dx_percent, double dy_percent )
+                                 double x, double y,
+                                 double dx, double dy,
+                                 double dx_percent, double dy_percent )
     {
-	if( button == InputSystem::MouseButton::MOUSE_RIGHT )
-	    camera.pan( dx_percent * 10, dy_percent * 10 );
-	else if( button == InputSystem::MouseButton::MOUSE_LEFT )
-	    camera.orbit( dx_percent, dy_percent );
+    if( button == InputSystem::MouseButton::MOUSE_RIGHT )
+        camera.pan( dx_percent * 10, dy_percent * 10 );
+    else if( button == InputSystem::MouseButton::MOUSE_LEFT )
+        camera.orbit( dx_percent, dy_percent );
     });
 }
 

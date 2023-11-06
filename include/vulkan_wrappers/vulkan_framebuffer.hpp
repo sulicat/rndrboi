@@ -12,16 +12,16 @@ namespace rndrboi
     class Framebuffer
     {
     public:
-	Framebuffer();
-	void create( VulkanDevice& dev, Swapchain& swapchain, RenderPass& render_pass );
-	void clean();
+    Framebuffer();
+    void create( VulkanDevice& dev, Swapchain& swapchain, RenderPass& render_pass );
+    void clean();
 
-	std::vector<VkFramebuffer> swapchain_framebuffers;
+    std::vector<VkFramebuffer> swapchain_framebuffers;
 
     private:
-	VulkanDevice* internal_dev;
-	Swapchain* internal_swapchain;
-	RenderPass* internal_render_pass;
+    VulkanDevice* internal_dev;
+    Swapchain* internal_swapchain;
+    RenderPass* internal_render_pass;
     };
 
 };

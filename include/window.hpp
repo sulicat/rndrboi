@@ -13,15 +13,15 @@ namespace rndrboi
     class WindowBase
     {
     public:
-	virtual ~WindowBase(){};
-	virtual void init() = 0;
-	virtual void handle_input() = 0;
-	virtual bool is_open() = 0;
-	virtual void cleanup() = 0;
+    virtual ~WindowBase(){};
+    virtual void init() = 0;
+    virtual void handle_input() = 0;
+    virtual bool is_open() = 0;
+    virtual void cleanup() = 0;
 
-	int width;
-	int height;
-	std::string title;
+    int width;
+    int height;
+    std::string title;
     };
 
     // ----------------------------------------------------------------------------------------------------
@@ -30,14 +30,14 @@ namespace rndrboi
     {
     public:
 
-	WindowGLFW();
-	~WindowGLFW();
-	void init();
-	void handle_input();
-	bool is_open();
-	void cleanup();
+    WindowGLFW();
+    ~WindowGLFW();
+    void init();
+    void handle_input();
+    bool is_open();
+    void cleanup();
 
-	GLFWwindow* window;
+    GLFWwindow* window;
     };
 
 
@@ -47,16 +47,16 @@ namespace rndrboi
     {
     public:
 
-	static Window* Instance();
-	std::shared_ptr<WindowBase> get();
-	void cleanup();
+    static Window* Instance();
+    std::shared_ptr<WindowBase> get();
+    void cleanup();
 
     private:
-	Window(){}
-	~Window(){}
+    Window(){}
+    ~Window(){}
 
-	std::shared_ptr<WindowBase> platform_window;
-	static Window* instance;
+    std::shared_ptr<WindowBase> platform_window;
+    static Window* instance;
     };
 
 

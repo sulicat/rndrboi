@@ -11,17 +11,17 @@ namespace rndrboi::components
     {
     public:
 
-	enum MESH_DEFAULT
-	{
-	    CUBE,
-	    SPHERE,
-	};
+    enum MESH_DEFAULT
+    {
+        CUBE,
+        SPHERE,
+    };
 
-	Mesh();
-	Mesh( MESH_DEFAULT type );
-	Mesh( std::string path );
+    Mesh();
+    Mesh( MESH_DEFAULT type );
+    Mesh( std::string path );
 
-	rndrboi::MESH_ID mesh_id;
+    rndrboi::MESH_ID mesh_id;
     };
 
 };

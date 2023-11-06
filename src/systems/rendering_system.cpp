@@ -24,7 +24,7 @@ RenderingSystem* RenderingSystem::Instance()
 {
     if (!singleton_instance)
     {
-	singleton_instance = new RenderingSystem;
+    singleton_instance = new RenderingSystem;
     }
     return singleton_instance;
 }
@@ -35,11 +35,11 @@ void RenderingSystem::init()
 
     // choose device
     rndrboi::VulkanDevicePreferences dev_preferences{};
-    dev_preferences.graphics		= true;
-    dev_preferences.present		= true;
-    dev_preferences.limit_one_queue	= true;
-    dev_preferences.debug		= true;
-    dev_preferences.print_info		= true;
+    dev_preferences.graphics        = true;
+    dev_preferences.present     = true;
+    dev_preferences.limit_one_queue = true;
+    dev_preferences.debug       = true;
+    dev_preferences.print_info      = true;
     device_data = VulkanDeviceInit::init( dev_preferences );
 
     sem_image_available.create( device_data );
@@ -51,9 +51,9 @@ void RenderingSystem::init()
 
     // render passes
     render_pass.create( device_data,
-			{
-			    .format = swapchain.image_format
-			});
+            {
+                .format = swapchain.image_format
+            });
 
     BufferManager::Instance()->init( device_data );
 
@@ -75,24 +75,25 @@ void RenderingSystem::init()
 
     // pipelines
     pipeline.create( device_data,
-		     render_pass,
-		     {
-			 .vert_shader_path	= "./compiled_shaders/shader.vert.spv",
-			 .frag_shader_path	= "./compiled_shaders/shader.frag.spv",
+             render_pass,
+             {
+             .vert_shader_path  = "./compiled_shaders/shader.vert.spv",
+             .frag_shader_path  = "./compiled_shaders/shader.frag.spv",
 
-			 .viewport_width	= (float)swapchain.width(),
-			 .viewport_height	= (float)swapchain.height(),
+             .viewport_width    = (float)swapchain.width(),
+             .viewport_height   = (float)swapchain.height(),
 
-			 .shader_attributes	= { { 0, Vertex::offset_pos(), VK_FORMAT_R32G32B32_SFLOAT },
-						    { 1, Vertex::offset_normal(), VK_FORMAT_R32G32B32_SFLOAT },
-						    { 2, Vertex::offset_uv(), VK_FORMAT_R32G32_SFLOAT },
-						    { 3, Vertex::offset_color(), VK_FORMAT_R32G32B32A32_SFLOAT } },
+             .shader_attributes = { { 0, Vertex::offset_pos(), VK_FORMAT_R32G32B32_SFLOAT },
+                            { 1, Vertex::offset_normal(), VK_FORMAT_R32G32B32_SFLOAT },
+                            { 2, Vertex::offset_uv(), VK_FORMAT_R32G32_SFLOAT },
+                            { 3, Vertex::offset_color(), VK_FORMAT_R32G32B32A32_SFLOAT } },
 
-			 .descriptor_layouts	= {
-			     uniform_manager.get_layout()
-			 },
+             .descriptor_layouts    = {
+                 uniform_manager.get_layout(),
+                 sampler_manager.get_layout()
+             },
 
-		     });
+             });
 
     // create a vertex buffer
     vertex_buffer = BufferManager::Instance()->get_buffer({ .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT });
@@ -118,8 +119,8 @@ void RenderingSystem::step( Scene& scene )
 
     if( image_res.second == SWAPCHAIN_STATUS::OUT_OF_DATE )
     {
-	recreate_swapchain();
-	return;
+    recreate_swapchain();
+    return;
     }
 
     fence_frame_in_flight.reset();
@@ -145,25 +146,26 @@ void RenderingSystem::step( Scene& scene )
     for(auto ent: renderables_view)
     {
         auto& mesh_comp = renderables_view.get<components::Mesh>(ent);
-	auto& mesh = AssetManager::Instance()->get_mesh( mesh_comp.mesh_id );
+    auto& mesh = AssetManager::Instance()->get_mesh( mesh_comp.mesh_id );
 
-	memcpy( vertex_buff_ptr,
-		mesh.vertex_data.data(), mesh.vertex_data.size() * sizeof(Vertex));
+    // TODO: suli -> slow here, fix next
+    memcpy( vertex_buff_ptr,
+        mesh.vertex_data.data(), mesh.vertex_data.size() * sizeof(Vertex));
 
-	command_manager.bind_vertex_buffer( vertex_buffer );
-	command_manager.bind_index_buffer( index_buffer );
+    command_manager.bind_vertex_buffer( vertex_buffer );
+    command_manager.bind_index_buffer( index_buffer );
 
-	model_view_projection.model = model_mat * translate_mat * rotate_mat * scale_mat;;
+    model_view_projection.model = model_mat * translate_mat * rotate_mat * scale_mat;;
 
-	memcpy( model_view_projection_ptr,
-		&model_view_projection,
-		sizeof(UniformModelViewProjection) );
+    memcpy( model_view_projection_ptr,
+        &model_view_projection,
+        sizeof(UniformModelViewProjection) );
 
-	command_manager.draw( pipeline,
-			      swapchain,
-			      { &uniform_manager },
-			      mesh.vertex_data.size(),
-			      false );
+    command_manager.draw( pipeline,
+                  swapchain,
+                  { &uniform_manager, &sampler_manager },
+                  mesh.vertex_data.size(),
+                  false );
     }
 
     command_manager.end_render_pass();

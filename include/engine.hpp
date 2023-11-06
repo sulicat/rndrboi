@@ -9,20 +9,20 @@ namespace rndrboi
     class Engine
     {
     public:
-	Engine();
-	~Engine();
-	bool is_running();
-	void init();
-	void step();
-	int close();
+    Engine();
+    ~Engine();
+    bool is_running();
+    void init();
+    void step();
+    int close();
 
-	Scene create_scene();
-	void set_scene( Scene& new_scene );
-	Scene& get_scene();
+    Scene create_scene();
+    void set_scene( Scene& new_scene );
+    Scene& get_scene();
 
     private:
-	std::shared_ptr<WindowBase> window;
-	Scene* scene;
+    std::shared_ptr<WindowBase> window;
+    Scene* scene;
     };
 
 };

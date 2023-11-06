@@ -8,23 +8,23 @@ namespace rndrboi
     class Config
     {
     public:
-	static Config* Instance();
+    static Config* Instance();
 
-	enum WINDOW_MANAGER
-	{
-	    GLFW,
-	    SDL,
-	    NONE
-	};
+    enum WINDOW_MANAGER
+    {
+        GLFW,
+        SDL,
+        NONE
+    };
 
-	const bool enable_debug = true;
-	const enum WINDOW_MANAGER window_manager = WINDOW_MANAGER::GLFW;
+    const bool enable_debug = true;
+    const enum WINDOW_MANAGER window_manager = WINDOW_MANAGER::GLFW;
 
     private:
-	Config();
-	~Config();
+    Config();
+    ~Config();
 
-	static Config* instance;
+    static Config* instance;
 
     };
 

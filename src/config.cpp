@@ -12,7 +12,7 @@ Config::~Config(){}
 
 Config* Config::Instance(){
     if (!instance){
-	instance = new Config;
+    instance = new Config;
     }
     return instance;
 }

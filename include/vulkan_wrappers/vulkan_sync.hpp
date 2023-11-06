@@ -10,30 +10,30 @@ namespace rndrboi
     class Semaphore
     {
     public:
-	Semaphore();
-	void create( VulkanDevice& device );
-	void clean();
+    Semaphore();
+    void create( VulkanDevice& device );
+    void clean();
 
-	VkSemaphore vk_sem;
+    VkSemaphore vk_sem;
 
     private:
-	VulkanDevice* internal_dev;
+    VulkanDevice* internal_dev;
     };
 
 
     class Fence
     {
     public:
-	Fence();
-	void create( VulkanDevice& device, bool is_signaled = false );
-	void clean();
-	void wait( uint64_t timeout = UINT64_MAX );
-	void reset();
+    Fence();
+    void create( VulkanDevice& device, bool is_signaled = false );
+    void clean();
+    void wait( uint64_t timeout = UINT64_MAX );
+    void reset();
 
-	VkFence vk_fence;
+    VkFence vk_fence;
 
     private:
-	VulkanDevice* internal_dev;
+    VulkanDevice* internal_dev;
     };
 
 }

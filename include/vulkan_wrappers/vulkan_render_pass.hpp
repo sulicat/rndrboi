@@ -9,15 +9,15 @@ namespace rndrboi
     class RenderPass
     {
     public:
-	RenderPass();
-	void create( VulkanDevice& dev, RenderPassSettings settings );
-	void clean();
+    RenderPass();
+    void create( VulkanDevice& dev, RenderPassSettings settings );
+    void clean();
 
         VkRenderPass render_pass;
 
     private:
-	RenderPassSettings settings;
-	VulkanDevice* dev_internal;
+    RenderPassSettings settings;
+    VulkanDevice* dev_internal;
 
     };
 

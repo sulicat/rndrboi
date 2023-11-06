@@ -30,15 +30,15 @@ glm::vec3 Camera::get_camera_pos()
 glm::mat4 Camera::get_view_mat()
 {
     return glm::lookAt( pos,
-			target,
-			up );
+            target,
+            up );
 }
 
 glm::mat4 Camera::get_projection_mat()
 {
     projection_mat = glm::perspective( glm::radians(45.0f),
-				       (float)width/(float)height,
-				       0.1f, 100.0f );
+                       (float)width/(float)height,
+                       0.1f, 100.0f );
     projection_mat[1][1] *= -1;
 
     return projection_mat;
@@ -64,7 +64,7 @@ void Camera::set_size( int w, int h )
 void Camera::orbit( float dx, float dy )
 {
     orbit_angle( dx * orbit_sensitivity,
-		 dy * orbit_sensitivity  );
+         dy * orbit_sensitivity  );
 }
 
 void Camera::orbit_angle( float angle_x, float angle_y )
@@ -77,13 +77,13 @@ void Camera::orbit_angle( float angle_x, float angle_y )
 
     // turntable type rotation on x axis
     rotate_mat_x = glm::rotate( rotate_mat_x,
-				glm::radians(angle_x),
-				z_axis );
+                glm::radians(angle_x),
+                z_axis );
 
     // rotate along camera right
     rotate_mat_y = glm::rotate( rotate_mat_y,
-				glm::radians(-angle_y),
-				glm::normalize(glm::cross(camera_direction, up)) );
+                glm::radians(-angle_y),
+                glm::normalize(glm::cross(camera_direction, up)) );
 
     // calculate the position with the applied orbit rotation
     glm::vec4 pos4 = glm::vec4(pos, 0);
@@ -97,7 +97,7 @@ void Camera::orbit_angle( float angle_x, float angle_y )
 void Camera::zoom( float dist )
 {
     if( dist * zoom_sensitivity < glm::distance(pos, target) ){
-	zoom_dist( dist * zoom_sensitivity );
+    zoom_dist( dist * zoom_sensitivity );
     }
 }
 
