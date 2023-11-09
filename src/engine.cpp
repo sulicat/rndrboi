@@ -20,6 +20,8 @@ void Engine::init()
 
     scene = new Scene();
 
+    Device::Instance()->init(); // initialize graphics card
+
     RenderingSystem::Instance()->init();
 }
 

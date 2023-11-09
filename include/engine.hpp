@@ -2,6 +2,7 @@
 #include "window.hpp"
 #include "systems/rendering_system.hpp"
 #include "systems/input_system.hpp"
+#include "vulkan_wrappers/vulkan_device.hpp"
 #include "scene.hpp"
 
 namespace rndrboi

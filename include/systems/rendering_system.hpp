@@ -5,7 +5,7 @@
 #include "config.hpp"
 #include "scene.hpp"
 #include "vulkan_wrappers/vulkan_types.hpp"
-#include "vulkan_wrappers/vulkan_init.hpp"
+#include "vulkan_wrappers/vulkan_device.hpp"
 #include "vulkan_wrappers/vulkan_swapchain.hpp"
 #include "vulkan_wrappers/vulkan_graphics_pipeline.hpp"
 #include "vulkan_wrappers/vulkan_render_pass.hpp"

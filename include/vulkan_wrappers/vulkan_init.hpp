@@ -30,5 +30,4 @@ namespace rndrboi
         QueFamilyInfo que_family_info( VulkanDevice& dev );
     };
 
-
 };

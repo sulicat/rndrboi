@@ -33,14 +33,7 @@ void RenderingSystem::init()
 {
     std::cout << OK_PRINT << "init\n";
 
-    // choose device
-    rndrboi::VulkanDevicePreferences dev_preferences{};
-    dev_preferences.graphics        = true;
-    dev_preferences.present         = true;
-    dev_preferences.limit_one_queue = true;
-    dev_preferences.debug           = true;
-    dev_preferences.print_info      = true;
-    device_data = VulkanDeviceInit::init( dev_preferences );
+    device_data = Device::Instance()->device;
 
     sem_image_available.create( device_data );
     sem_render_finished.create( device_data );

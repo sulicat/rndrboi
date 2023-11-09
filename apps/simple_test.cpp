@@ -1,15 +1,7 @@
 #include <iostream>
 
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
-
 #include "rndrboi.hpp"
 
-struct Velocity
-{
-    float vx;
-    float vy;
-};
 
 int main( int argc, char** argv )
 {
@@ -23,11 +15,15 @@ int main( int argc, char** argv )
     scene.add_component<rndrboi::components::Renderable>	(cube);
     scene.add_component<rndrboi::components::Mesh>		(cube, rndrboi::components::Mesh::CUBE);
     scene.add_component<rndrboi::components::Transform>		(cube);
+    scene.add_component<rndrboi::components::Material>		(cube);
+    auto& cube_mat = scene.get_component<rndrboi::components::Material>(cube);
+    cube_mat.set_diffuse( "resources/textures/wood_light.jpg" );
+
 
     uint32_t susanne = scene.create_entity();
     scene.add_component<rndrboi::components::Renderable>	(susanne);
     scene.add_component<rndrboi::components::Mesh>		(susanne, "resources/susanne.obj");
-    //scene.add_component<rndrboi::components::Material>		(susanne);
+    scene.add_component<rndrboi::components::Material>		(susanne);
     scene.add_component<rndrboi::components::Transform>		(susanne);
 
     /*
