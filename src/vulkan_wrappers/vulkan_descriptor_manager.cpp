@@ -1,23 +1,23 @@
-#include "vulkan_wrappers/vulkan_uniform_manager.hpp"
+#include "vulkan_wrappers/vulkan_descriptor_manager.hpp"
 
-#define OK_PRINT (A_YELLOW "[VULKAN UNIFORM MANAGER] " A_RESET)
-#define BAD_PRINT (A_RED "[VULKAN UNIFORM MANAGER] " A_RESET)
+#define OK_PRINT (A_YELLOW "[VULKAN DESCRIPTOR MANAGER] " A_RESET)
+#define BAD_PRINT (A_RED "[VULKAN DESCRIPTOR MANAGER] " A_RESET)
 
 using namespace rndrboi;
 
-UniformManager::UniformManager()
+DescriptorManager::DescriptorManager()
 {
 
 }
 
-void UniformManager::create( VulkanDevice& dev, uint32_t descriptor_set_binding_in)
+void DescriptorManager::create( VulkanDevice& dev, uint32_t descriptor_set_binding_in)
 {
     internal_device = &dev;
 
     descriptor_set_binding = descriptor_set_binding_in;
 }
 
-void UniformManager::create_dummy_texture()
+void DescriptorManager::create_dummy_texture()
 {
     dummy_texture.create( *internal_device );
     char* temp_data = (char*)malloc( sizeof(char)*(1*1*4) );
@@ -27,7 +27,7 @@ void UniformManager::create_dummy_texture()
 }
 
 
-Sampler* UniformManager::add_dummy_sampler( int bind_point_in )
+Sampler* DescriptorManager::add_dummy_sampler( int bind_point_in )
 {
     if( !dummy_texture_created )
         create_dummy_texture();
@@ -36,7 +36,7 @@ Sampler* UniformManager::add_dummy_sampler( int bind_point_in )
     return sampler;
 }
 
-Sampler* UniformManager::add_sampler( int bind_point_in, VkImageView image_view_in )
+Sampler* DescriptorManager::add_sampler( int bind_point_in, VkImageView image_view_in )
 {
     Sampler* sampler_out = new Sampler;
     sampler_out->bind_point = bind_point_in;
@@ -78,7 +78,7 @@ Sampler* UniformManager::add_sampler( int bind_point_in, VkImageView image_view_
 
 
 
-void UniformManager::done()
+void DescriptorManager::done()
 {
     if( uniforms.size() <= 0 && samplers.size() <= 0 )
     {
@@ -89,12 +89,12 @@ void UniformManager::done()
     // create descriptor pool ------------------------------------------------------------
 
     VkDescriptorPoolSize pool_size_uniform{};
-    pool_size_uniform.type      = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    pool_size_uniform.descriptorCount   = (uint32_t)uniforms.size();
+    pool_size_uniform.type            = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    pool_size_uniform.descriptorCount = (uint32_t)uniforms.size();
 
     VkDescriptorPoolSize pool_size_sampler{};
-    pool_size_sampler.type      = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    pool_size_sampler.descriptorCount   = (uint32_t)samplers.size();
+    pool_size_sampler.type            = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    pool_size_sampler.descriptorCount = (uint32_t)samplers.size();
 
     std::vector<VkDescriptorPoolSize> pool_sizes;
 
@@ -105,7 +105,7 @@ void UniformManager::done()
         pool_sizes.push_back( pool_size_sampler );
 
     VkDescriptorPoolCreateInfo pool_info{};
-    pool_info.sType     = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+    pool_info.sType         = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
     pool_info.poolSizeCount = pool_sizes.size();
     pool_info.pPoolSizes    = pool_sizes.data();
     pool_info.maxSets       = ( (uint32_t)uniforms.size() + (uint32_t)samplers.size() );
@@ -122,10 +122,10 @@ void UniformManager::done()
     layout = new_layout();
 
     VkDescriptorSetAllocateInfo alloc_info{};
-    alloc_info.sType            = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-    alloc_info.descriptorPool       = descriptor_pool;
-    alloc_info.descriptorSetCount   = 1;
-    alloc_info.pSetLayouts      = &layout;
+    alloc_info.sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+    alloc_info.descriptorPool     = descriptor_pool;
+    alloc_info.descriptorSetCount = 1;
+    alloc_info.pSetLayouts        = &layout;
 
     res = vkAllocateDescriptorSets( internal_device->logical_device,
                                     &alloc_info,
@@ -145,13 +145,13 @@ void UniformManager::done()
         buffer_info.range   = uni->size;
 
         VkWriteDescriptorSet descriptor_write{};
-        descriptor_write.sType          = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        descriptor_write.dstSet         = descriptor_set;
-        descriptor_write.dstBinding     = uni->bind_point;
-        descriptor_write.dstArrayElement    = 0;
-        descriptor_write.descriptorType     = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        descriptor_write.descriptorCount    = 1;
-        descriptor_write.pBufferInfo        = &buffer_info;
+        descriptor_write.sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        descriptor_write.dstSet          = descriptor_set;
+        descriptor_write.dstBinding      = uni->bind_point;
+        descriptor_write.dstArrayElement = 0;
+        descriptor_write.descriptorType  = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        descriptor_write.descriptorCount = 1;
+        descriptor_write.pBufferInfo     = &buffer_info;
 
         vkUpdateDescriptorSets( internal_device->logical_device,
                                 1,
@@ -171,13 +171,13 @@ void UniformManager::done()
         image_info.sampler = sampler->sampler;
 
         VkWriteDescriptorSet descriptor_write{};
-        descriptor_write.sType          = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        descriptor_write.dstSet         = descriptor_set;
-        descriptor_write.dstBinding     = sampler->bind_point;
-        descriptor_write.dstArrayElement    = 0;
-        descriptor_write.descriptorType     = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        descriptor_write.descriptorCount    = 1;
-        descriptor_write.pImageInfo     = &image_info;
+        descriptor_write.sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        descriptor_write.dstSet          = descriptor_set;
+        descriptor_write.dstBinding      = sampler->bind_point;
+        descriptor_write.dstArrayElement = 0;
+        descriptor_write.descriptorType  = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        descriptor_write.descriptorCount = 1;
+        descriptor_write.pImageInfo      = &image_info;
 
         vkUpdateDescriptorSets( internal_device->logical_device,
                                 1,
@@ -189,7 +189,7 @@ void UniformManager::done()
 
 }
 
-VkDescriptorSetLayout UniformManager::new_layout()
+VkDescriptorSetLayout DescriptorManager::new_layout()
 {
     VkDescriptorSetLayout out;
 
@@ -199,22 +199,22 @@ VkDescriptorSetLayout UniformManager::new_layout()
     // uniforms
     for( int i = 0; i < uniforms.size(); i++ )
     {
-        layout_bindings[i].binding      = uniforms[i]->bind_point;
-        layout_bindings[i].descriptorType   = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        layout_bindings[i].descriptorCount  = 1;
-        layout_bindings[i].stageFlags       = VK_SHADER_STAGE_ALL_GRAPHICS;
-        layout_bindings[i].pImmutableSamplers   = nullptr;
+        layout_bindings[i].binding            = uniforms[i]->bind_point;
+        layout_bindings[i].descriptorType     = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        layout_bindings[i].descriptorCount    = 1;
+        layout_bindings[i].stageFlags         = VK_SHADER_STAGE_ALL_GRAPHICS;
+        layout_bindings[i].pImmutableSamplers = nullptr;
     }
 
     // samplers
     int offs = uniforms.size();
     for( int i = 0; i < samplers.size(); i++ )
     {
-        layout_bindings[i + offs].binding       = samplers[i]->bind_point;
-        layout_bindings[i + offs].descriptorType    = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        layout_bindings[i + offs].descriptorCount   = 1;
-        layout_bindings[i + offs].stageFlags        = VK_SHADER_STAGE_ALL_GRAPHICS;
-        layout_bindings[i + offs].pImmutableSamplers    = nullptr;
+        layout_bindings[i + offs].binding            = samplers[i]->bind_point;
+        layout_bindings[i + offs].descriptorType     = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        layout_bindings[i + offs].descriptorCount    = 1;
+        layout_bindings[i + offs].stageFlags         = VK_SHADER_STAGE_ALL_GRAPHICS;
+        layout_bindings[i + offs].pImmutableSamplers = nullptr;
     }
 
 
@@ -234,12 +234,12 @@ VkDescriptorSetLayout UniformManager::new_layout()
     return std::move(out);
 }
 
-VkDescriptorSetLayout UniformManager::get_layout()
+VkDescriptorSetLayout DescriptorManager::get_layout()
 {
     return layout;
 }
 
-void UniformManager::clean()
+void DescriptorManager::clean()
 {
     for( auto& sampler : samplers )
     {

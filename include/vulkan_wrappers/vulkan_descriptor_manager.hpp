@@ -7,8 +7,8 @@
 
 #include "utils.hpp"
 
-#define OK_PRINT_UM (A_YELLOW "[VULKAN UNIFORM MANAGER] " A_RESET)
-#define BAD_PRINT_UM (A_RED "[VULKAN UNIFORM MANAGER] " A_RESET)
+#define OK_PRINT_UM (A_YELLOW "[VULKAN DESCREIPTOR MANAGER] " A_RESET)
+#define BAD_PRINT_UM (A_RED "[VULKAN DESCRIPTOR MANAGER] " A_RESET)
 
 namespace rndrboi
 {
@@ -30,10 +30,10 @@ namespace rndrboi
     };
 
 
-    class UniformManager
+    class DescriptorManager
     {
     public:
-        UniformManager();
+        DescriptorManager();
         void create( VulkanDevice& dev, uint32_t descriptor_set_binding_in = 0 );
 
         template <typename T>

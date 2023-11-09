@@ -87,37 +87,37 @@ void GraphicsPipeline::create( VulkanDevice& dev, RenderPass& render_pass, Graph
 
 
     VkPipelineDynamicStateCreateInfo dynamic_state_create_info{};
-    dynamic_state_create_info.sType     = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+    dynamic_state_create_info.sType             = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
     dynamic_state_create_info.dynamicStateCount = static_cast<uint32_t>(dynamic_states.size());
     dynamic_state_create_info.pDynamicStates    = dynamic_states.data();
 
     // dynamic state viewport
     VkPipelineViewportStateCreateInfo viewport_state_create_info{};
-    viewport_state_create_info.sType        = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-    viewport_state_create_info.viewportCount    = 1;
-    viewport_state_create_info.scissorCount = 1;
+    viewport_state_create_info.sType         = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+    viewport_state_create_info.viewportCount = 1;
+    viewport_state_create_info.scissorCount  = 1;
 
     // rasterizer
     VkPipelineRasterizationStateCreateInfo rasterizer_create_info{};
-    rasterizer_create_info.sType            = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
-    rasterizer_create_info.depthClampEnable     = VK_FALSE;
-    rasterizer_create_info.rasterizerDiscardEnable  = VK_FALSE;
-    rasterizer_create_info.polygonMode          = settings.polygon_mode;
-    rasterizer_create_info.lineWidth            = 1.0f;
-    rasterizer_create_info.cullMode         = settings.cull_mode;
-    rasterizer_create_info.frontFace            = settings.front_face;
-    rasterizer_create_info.depthBiasEnable      = VK_FALSE;
-    rasterizer_create_info.depthBiasConstantFactor  = 0.0f;
-    rasterizer_create_info.depthBiasClamp       = 0.0f;
-    rasterizer_create_info.depthBiasSlopeFactor     = 0.0f;
+    rasterizer_create_info.sType                   = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+    rasterizer_create_info.depthClampEnable        = VK_FALSE;
+    rasterizer_create_info.rasterizerDiscardEnable = VK_FALSE;
+    rasterizer_create_info.polygonMode             = settings.polygon_mode;
+    rasterizer_create_info.lineWidth               = 1.0f;
+    rasterizer_create_info.cullMode                = settings.cull_mode;
+    rasterizer_create_info.frontFace               = settings.front_face;
+    rasterizer_create_info.depthBiasEnable         = VK_FALSE;
+    rasterizer_create_info.depthBiasConstantFactor = 0.0f;
+    rasterizer_create_info.depthBiasClamp          = 0.0f;
+    rasterizer_create_info.depthBiasSlopeFactor    = 0.0f;
 
     // disable multisampling
     VkPipelineMultisampleStateCreateInfo multisampling_create_info{};
-    multisampling_create_info.sType         = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+    multisampling_create_info.sType                 = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
     multisampling_create_info.sampleShadingEnable   = VK_FALSE;
     multisampling_create_info.rasterizationSamples  = VK_SAMPLE_COUNT_1_BIT;
     multisampling_create_info.minSampleShading      = 1.0f;     // Optional
-    multisampling_create_info.pSampleMask       = nullptr;  // Optional
+    multisampling_create_info.pSampleMask           = nullptr;  // Optional
     multisampling_create_info.alphaToCoverageEnable = VK_FALSE; // Optional
     multisampling_create_info.alphaToOneEnable      = VK_FALSE; // Optional
 
@@ -131,13 +131,13 @@ void GraphicsPipeline::create( VulkanDevice& dev, RenderPass& render_pass, Graph
 
     if( settings.blend_type == ALPHA_BLEND )
     {
-        color_blend_attachment_create_info.blendEnable      = VK_TRUE;
-        color_blend_attachment_create_info.srcColorBlendFactor  = VK_BLEND_FACTOR_SRC_ALPHA;
-        color_blend_attachment_create_info.dstColorBlendFactor  = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-        color_blend_attachment_create_info.colorBlendOp     = VK_BLEND_OP_ADD;
-        color_blend_attachment_create_info.srcAlphaBlendFactor  = VK_BLEND_FACTOR_ONE;
-        color_blend_attachment_create_info.dstAlphaBlendFactor  = VK_BLEND_FACTOR_ZERO;
-        color_blend_attachment_create_info.alphaBlendOp     = VK_BLEND_OP_ADD;
+        color_blend_attachment_create_info.blendEnable         = VK_TRUE;
+        color_blend_attachment_create_info.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+        color_blend_attachment_create_info.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+        color_blend_attachment_create_info.colorBlendOp        = VK_BLEND_OP_ADD;
+        color_blend_attachment_create_info.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+        color_blend_attachment_create_info.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
+        color_blend_attachment_create_info.alphaBlendOp        = VK_BLEND_OP_ADD;
     }
     else
     {
@@ -145,23 +145,23 @@ void GraphicsPipeline::create( VulkanDevice& dev, RenderPass& render_pass, Graph
     }
 
     VkPipelineColorBlendStateCreateInfo color_blend_create_info{};
-    color_blend_create_info.sType       = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
-    color_blend_create_info.logicOpEnable   = settings.blend_type == OFF ? VK_FALSE : VK_TRUE;
-    color_blend_create_info.logicOp     = VK_LOGIC_OP_COPY; // Optional
-    color_blend_create_info.attachmentCount = 1;
-    color_blend_create_info.pAttachments    = &color_blend_attachment_create_info;
-    color_blend_create_info.blendConstants[0]   = 0.0f;         // Optional
-    color_blend_create_info.blendConstants[1]   = 0.0f;         // Optional
-    color_blend_create_info.blendConstants[2]   = 0.0f;         // Optional
-    color_blend_create_info.blendConstants[3]   = 0.0f;         // Optional
+    color_blend_create_info.sType             = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+    color_blend_create_info.logicOpEnable     = settings.blend_type == OFF ? VK_FALSE : VK_TRUE;
+    color_blend_create_info.logicOp           = VK_LOGIC_OP_COPY; // Optional
+    color_blend_create_info.attachmentCount   = 1;
+    color_blend_create_info.pAttachments      = &color_blend_attachment_create_info;
+    color_blend_create_info.blendConstants[0] = 0.0f;         // Optional
+    color_blend_create_info.blendConstants[1] = 0.0f;         // Optional
+    color_blend_create_info.blendConstants[2] = 0.0f;         // Optional
+    color_blend_create_info.blendConstants[3] = 0.0f;         // Optional
 
     // layout
     VkPipelineLayoutCreateInfo pipeline_layout_create_info{};
-    pipeline_layout_create_info.sType           = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    pipeline_layout_create_info.setLayoutCount      = settings.descriptor_layouts.size();
-    pipeline_layout_create_info.pSetLayouts     = settings.descriptor_layouts.data();
-    pipeline_layout_create_info.pushConstantRangeCount  = 0;        // Optional
-    pipeline_layout_create_info.pPushConstantRanges = nullptr;  // Optional
+    pipeline_layout_create_info.sType                  = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    pipeline_layout_create_info.setLayoutCount         = settings.descriptor_layouts.size();
+    pipeline_layout_create_info.pSetLayouts            = settings.descriptor_layouts.data();
+    pipeline_layout_create_info.pushConstantRangeCount = 0;        // Optional
+    pipeline_layout_create_info.pPushConstantRanges    = nullptr;  // Optional
 
     VkResult res = vkCreatePipelineLayout( dev.logical_device,
                                            &pipeline_layout_create_info,
@@ -175,22 +175,22 @@ void GraphicsPipeline::create( VulkanDevice& dev, RenderPass& render_pass, Graph
 
     // create the pipeline
     VkGraphicsPipelineCreateInfo pipeline_create_info{};
-    pipeline_create_info.sType          = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-    pipeline_create_info.stageCount     = 2;
-    pipeline_create_info.pStages        = shader_stages;
-    pipeline_create_info.pVertexInputState  = &vertex_input_state_create_info;
-    pipeline_create_info.pInputAssemblyState    = &input_assembly_create_info;
-    pipeline_create_info.pViewportState     = &viewport_state_create_info;
-    pipeline_create_info.pRasterizationState    = &rasterizer_create_info;
-    pipeline_create_info.pMultisampleState  = &multisampling_create_info;
-    pipeline_create_info.pDepthStencilState = nullptr;
-    pipeline_create_info.pColorBlendState   = &color_blend_create_info;
-    pipeline_create_info.pDynamicState      = &dynamic_state_create_info;
-    pipeline_create_info.layout         = pipeline_layout;
-    pipeline_create_info.renderPass     = render_pass.render_pass;
-    pipeline_create_info.subpass        = 0;
-    pipeline_create_info.basePipelineHandle = VK_NULL_HANDLE;
-    pipeline_create_info.basePipelineIndex  = -1;
+    pipeline_create_info.sType               = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+    pipeline_create_info.stageCount          = 2;
+    pipeline_create_info.pStages             = shader_stages;
+    pipeline_create_info.pVertexInputState   = &vertex_input_state_create_info;
+    pipeline_create_info.pInputAssemblyState = &input_assembly_create_info;
+    pipeline_create_info.pViewportState      = &viewport_state_create_info;
+    pipeline_create_info.pRasterizationState = &rasterizer_create_info;
+    pipeline_create_info.pMultisampleState   = &multisampling_create_info;
+    pipeline_create_info.pDepthStencilState  = nullptr;
+    pipeline_create_info.pColorBlendState    = &color_blend_create_info;
+    pipeline_create_info.pDynamicState       = &dynamic_state_create_info;
+    pipeline_create_info.layout              = pipeline_layout;
+    pipeline_create_info.renderPass          = render_pass.render_pass;
+    pipeline_create_info.subpass             = 0;
+    pipeline_create_info.basePipelineHandle  = VK_NULL_HANDLE;
+    pipeline_create_info.basePipelineIndex   = -1;
 
     res = vkCreateGraphicsPipelines( dev.logical_device,
                                      VK_NULL_HANDLE,

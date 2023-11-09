@@ -13,7 +13,7 @@
 #include "vulkan_wrappers/vulkan_command_manager.hpp"
 #include "vulkan_wrappers/vulkan_sync.hpp"
 #include "vulkan_wrappers/vulkan_buffer_manager.hpp"
-#include "vulkan_wrappers/vulkan_uniform_manager.hpp"
+#include "vulkan_wrappers/vulkan_descriptor_manager.hpp"
 #include <vulkan/vulkan.h>
 #include "vulkan_wrappers/vulkan_texture.hpp"
 
@@ -57,8 +57,8 @@ namespace rndrboi
         rndrboi::Semaphore sem_render_finished;
         rndrboi::Fence fence_frame_in_flight;
 
-        rndrboi::UniformManager uniform_manager;
-        rndrboi::UniformManager sampler_manager;
+        rndrboi::DescriptorManager uniform_manager;
+        rndrboi::DescriptorManager sampler_manager;
 
         UniformModelViewProjection model_view_projection;
         void* model_view_projection_ptr;

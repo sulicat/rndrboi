@@ -36,9 +36,9 @@ void RenderingSystem::init()
     // choose device
     rndrboi::VulkanDevicePreferences dev_preferences{};
     dev_preferences.graphics        = true;
-    dev_preferences.present     = true;
+    dev_preferences.present         = true;
     dev_preferences.limit_one_queue = true;
-    dev_preferences.debug       = true;
+    dev_preferences.debug           = true;
     dev_preferences.print_info      = true;
     device_data = VulkanDeviceInit::init( dev_preferences );
 
