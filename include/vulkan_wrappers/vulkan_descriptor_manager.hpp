@@ -56,6 +56,7 @@ namespace rndrboi
         }
 
         Sampler* add_sampler( int bind_point_in, VkImageView image_view_in );
+        Sampler* update_sampler( int bind_point_in, VkImageView image_view_in );
         Sampler* add_dummy_sampler( int bind_point_in );
 
         VkDescriptorSetLayout new_layout();
@@ -70,6 +71,7 @@ namespace rndrboi
 
     private:
         void create_dummy_texture();
+        Sampler* new_sampler(int bind_point_in, VkImageView image_view_in);
 
         VulkanDevice* internal_device;
         std::vector<Uniform*> uniforms;

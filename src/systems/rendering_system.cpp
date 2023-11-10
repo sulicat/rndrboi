@@ -1,8 +1,7 @@
 #include "systems/rendering_system.hpp"
 #include "vulkan_wrappers/vulkan_api_helpers.hpp"
 #include "vulkan_wrappers/vulkan_vertex.hpp"
-#include "components/renderable.hpp"
-#include "components/mesh_component.hpp"
+#include "components/all.hpp"
 
 
 #include <set>
@@ -56,15 +55,8 @@ void RenderingSystem::init()
     model_view_projection_ptr = uniform_mvp->data_ptr;
     uniform_manager.done();
 
-    // 5 dummy textures
-    sampler_manager.create( device_data );
-    sampler_manager.add_dummy_sampler( 0 );
-    sampler_manager.add_dummy_sampler( 1 );
-    sampler_manager.add_dummy_sampler( 2 );
-    sampler_manager.add_dummy_sampler( 3 );
-    sampler_manager.add_dummy_sampler( 4 );
-    sampler_manager.done();
-
+    // dummy textured material
+    MaterialTextured textured_mat;
 
     // pipelines
     pipeline.create( device_data,
@@ -83,7 +75,7 @@ void RenderingSystem::init()
 
                          .descriptor_layouts    = {
                              uniform_manager.get_layout(),
-                             sampler_manager.get_layout()
+                             textured_mat.descriptor_manager.get_layout()
                          },
 
                      });
@@ -121,7 +113,9 @@ void RenderingSystem::step( Scene& scene )
     // ----------------------------------------------------------------------------------------------------
 
     // get all renderables
-    auto renderables_view = scene.registry->view<components::Renderable, components::Mesh>();
+    auto renderables_view = scene.registry->view<components::Renderable,
+                                                 components::Mesh,
+                                                 components::Material>();
 
     glm::mat4 model_mat = glm::mat4(1.0f);
     glm::mat4 rotate_mat = glm::mat4(1.0f);
@@ -140,6 +134,7 @@ void RenderingSystem::step( Scene& scene )
     {
         auto& mesh_comp = renderables_view.get<components::Mesh>(ent);
         auto& mesh = AssetManager::Instance()->get_mesh( mesh_comp.mesh_id );
+        auto& material_comp = renderables_view.get<components::Material>(ent);
 
         // TODO: suli -> slow here, fix next
         memcpy( vertex_buff_ptr,
@@ -156,7 +151,10 @@ void RenderingSystem::step( Scene& scene )
 
         command_manager.draw( pipeline,
                               swapchain,
-                              { &uniform_manager, &sampler_manager },
+                              {
+                                  &uniform_manager,
+                                  &material_comp.mat.descriptor_manager
+                              },
                               mesh.vertex_data.size(),
                               false );
     }
@@ -188,7 +186,6 @@ void RenderingSystem::cleanup()
     VulkanDeviceInit::wait_idle( device_data );
 
     uniform_manager.clean();
-    sampler_manager.clean();
 
     sem_image_available.clean();
     sem_render_finished.clean();

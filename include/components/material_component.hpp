@@ -12,7 +12,7 @@ namespace rndrboi::components
         Material();
         void set_diffuse( std::string path );
 
-        rndrboi::MaterialTextured mat;
+        rndrboi::MATERIAL_ID mat;
     };
 
 };

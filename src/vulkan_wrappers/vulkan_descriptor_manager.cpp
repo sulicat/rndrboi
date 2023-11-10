@@ -36,7 +36,30 @@ Sampler* DescriptorManager::add_dummy_sampler( int bind_point_in )
     return sampler;
 }
 
-Sampler* DescriptorManager::add_sampler( int bind_point_in, VkImageView image_view_in )
+Sampler* DescriptorManager::update_sampler( int bind_point_in, VkImageView image_view_in )
+{
+    for( int i = 0; i < samplers.size(); i++  )
+    {
+        Sampler* sampler = samplers[i];
+
+        if( sampler->bind_point == bind_point_in )
+        {
+            vkDestroySampler( internal_device->logical_device,
+                              sampler->sampler,
+                              nullptr );
+            delete sampler;
+
+            Sampler* updated_sampler = new_sampler( bind_point_in, image_view_in );
+            samplers[i] = updated_sampler;
+            return updated_sampler;
+        }
+
+    }
+
+    return NULL;
+}
+
+Sampler* DescriptorManager::new_sampler( int bind_point_in, VkImageView image_view_in )
 {
     Sampler* sampler_out = new Sampler;
     sampler_out->bind_point = bind_point_in;
@@ -72,6 +95,12 @@ Sampler* DescriptorManager::add_sampler( int bind_point_in, VkImageView image_vi
     }
 
     std::cout << OK_PRINT_UM << "Created sampler: " << bind_point_in << "\n";
+    return sampler_out;
+}
+
+Sampler* DescriptorManager::add_sampler( int bind_point_in, VkImageView image_view_in )
+{
+    Sampler* sampler_out = new_sampler( bind_point_in, image_view_in );
     samplers.push_back( sampler_out );
     return samplers[ samplers.size()-1];
 }
@@ -247,6 +276,8 @@ void DescriptorManager::clean()
         vkDestroySampler( internal_device->logical_device,
                           sampler->sampler,
                           nullptr );
+
+        delete sampler;
     }
 
 

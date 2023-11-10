@@ -58,7 +58,6 @@ namespace rndrboi
         rndrboi::Fence fence_frame_in_flight;
 
         rndrboi::DescriptorManager uniform_manager;
-        rndrboi::DescriptorManager sampler_manager;
 
         UniformModelViewProjection model_view_projection;
         void* model_view_projection_ptr;
