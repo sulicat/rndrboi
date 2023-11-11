@@ -23,6 +23,7 @@ namespace rndrboi
     class Model
     {
     public:
+
         Mesh* mesh(int i);
         MaterialTextured* material(int i);
         int size();

@@ -115,6 +115,20 @@ void DescriptorManager::done()
         return;
     }
 
+    // if we are doing "done" again at runtime,
+    // delete the old descreiptor pool and descriptor layout
+    if( has_done_once )
+    {
+        vkDestroyDescriptorPool( internal_device->logical_device,
+                                 descriptor_pool,
+                                 nullptr );
+
+        vkDestroyDescriptorSetLayout( internal_device->logical_device,
+                                      layout,
+                                      nullptr );
+    }
+    has_done_once = true;
+
     // create descriptor pool ------------------------------------------------------------
 
     VkDescriptorPoolSize pool_size_uniform{};

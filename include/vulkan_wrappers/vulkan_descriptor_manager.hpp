@@ -79,6 +79,7 @@ namespace rndrboi
 
         bool dummy_texture_created = false;
         rndrboi::VulkanTexture dummy_texture;
+        bool has_done_once = false;
     };
 
 };

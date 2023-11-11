@@ -17,7 +17,6 @@ MaterialTextured::MaterialTextured()
 void MaterialTextured::set_diffuse( std::string path )
 {
     diffuse_texture.load( path );
-
     descriptor_manager.update_sampler( 0, diffuse_texture.image_view );
     descriptor_manager.done();
 
@@ -26,5 +25,8 @@ void MaterialTextured::set_diffuse( std::string path )
 
 void MaterialTextured::clean()
 {
+    if( has_diffuse )
+        diffuse_texture.clean();
+
     descriptor_manager.clean();
 }

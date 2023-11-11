@@ -134,11 +134,11 @@ void RenderingSystem::step( Scene& scene )
         {
 
             Mesh* mesh = model->mesh(i);
+            MaterialTextured* material = model->material(i);
 
             // TODO: suli -> slow here, fix next
             memcpy( vertex_buff_ptr,
                     mesh->vertex_data.data(), mesh->vertex_data.size() * sizeof(Vertex));
-
 
             command_manager.bind_vertex_buffer( vertex_buffer );
             command_manager.bind_index_buffer( index_buffer );

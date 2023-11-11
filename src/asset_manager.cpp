@@ -61,8 +61,6 @@ void AssetManager::add_mesh_to_model( MODEL_ID model_id, MESH_ID mesh_id )
 
 ASSET_ID AssetManager::add_mesh()
 {
-    std::cout << ATTENTION_PRINT << "Adding Mesh\n";
-
     Mesh* new_mesh = new Mesh();
     meshes.push_back( new_mesh );
     return meshes.size()-1;

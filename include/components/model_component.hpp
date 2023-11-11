@@ -7,13 +7,11 @@
 
 namespace rndrboi::components
 {
-
     enum MODEL_DEFAULT
     {
         CUBE,
         SPHERE,
     };
-
 
     class Model
     {
@@ -21,6 +19,7 @@ namespace rndrboi::components
         Model();
         Model( MODEL_DEFAULT type_in );
         void create_empty();
+        rndrboi::Model* get_model();
 
         MODEL_ID model_id;
     };

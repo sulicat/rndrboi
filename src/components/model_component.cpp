@@ -27,3 +27,8 @@ void Model::create_empty()
     model_id = AssetManager::Instance()->add_model();
 }
 
+
+rndrboi::Model* rndrboi::components::Model::get_model()
+{
+    return rndrboi::AssetManager::Instance()->get_model( model_id );
+}
