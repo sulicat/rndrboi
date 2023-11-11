@@ -47,7 +47,7 @@ void RenderingSystem::init()
                             .format = swapchain.image_format
                         });
 
-    BufferManager::Instance()->init( device_data );
+    material_template_textured = new MaterialTextured;
 
     // uniforms
     uniform_manager.create( device_data );
@@ -72,6 +72,7 @@ void RenderingSystem::init()
 
                          .descriptor_layouts    = {
                              uniform_manager.get_layout(),
+                             material_template_textured->descriptor_manager.get_layout()
                          },
 
                      });
@@ -153,6 +154,7 @@ void RenderingSystem::step( Scene& scene )
                                   swapchain,
                                   {
                                       &uniform_manager,
+                                      &material->descriptor_manager
                                   },
                                   mesh->vertex_data.size(),
                                   false );
@@ -186,6 +188,9 @@ void RenderingSystem::cleanup()
     VulkanDeviceInit::wait_idle( device_data );
 
     uniform_manager.clean();
+
+    material_template_textured->clean();
+    delete material_template_textured;
 
     sem_image_available.clean();
     sem_render_finished.clean();

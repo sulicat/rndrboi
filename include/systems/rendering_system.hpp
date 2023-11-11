@@ -66,6 +66,8 @@ namespace rndrboi
         rndrboi::Buffer* index_buffer;
         void* vertex_buff_ptr;
 
+        MaterialTextured* material_template_textured;
+
         static RenderingSystem* singleton_instance;
 
     };

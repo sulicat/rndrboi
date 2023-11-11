@@ -21,7 +21,7 @@ void Engine::init()
     scene = new Scene();
 
     Device::Instance()->init(); // initialize graphics card
-
+    BufferManager::Instance()->init(Device::Instance()->device);
     RenderingSystem::Instance()->init();
 }
 
