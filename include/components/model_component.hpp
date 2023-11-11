@@ -8,12 +8,21 @@
 namespace rndrboi::components
 {
 
+    enum MODEL_DEFAULT
+    {
+        CUBE,
+        SPHERE,
+    };
+
+
     class Model
     {
     public:
-        Mesh();
+        Model();
+        Model( MODEL_DEFAULT type_in );
+        void create_empty();
 
-        std::vector<rndrboi::MESH_ID> meshes;
+        MODEL_ID model_id;
     };
 
 };

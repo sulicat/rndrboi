@@ -23,3 +23,8 @@ void MaterialTextured::set_diffuse( std::string path )
 
     has_diffuse = true;
 }
+
+void MaterialTextured::clean()
+{
+    descriptor_manager.clean();
+}

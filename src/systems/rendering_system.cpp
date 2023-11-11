@@ -55,9 +55,6 @@ void RenderingSystem::init()
     model_view_projection_ptr = uniform_mvp->data_ptr;
     uniform_manager.done();
 
-    // dummy textured material
-    MaterialTextured textured_mat;
-
     // pipelines
     pipeline.create( device_data,
                      render_pass,
@@ -75,7 +72,6 @@ void RenderingSystem::init()
 
                          .descriptor_layouts    = {
                              uniform_manager.get_layout(),
-                             textured_mat.descriptor_manager.get_layout()
                          },
 
                      });
@@ -113,9 +109,8 @@ void RenderingSystem::step( Scene& scene )
     // ----------------------------------------------------------------------------------------------------
 
     // get all renderables
-    auto renderables_view = scene.registry->view<components::Renderable,
-                                                 components::Mesh,
-                                                 components::Material>();
+    auto renderables_view = scene.registry->view< components::Renderable,
+                                                  components::Model >();
 
     glm::mat4 model_mat = glm::mat4(1.0f);
     glm::mat4 rotate_mat = glm::mat4(1.0f);
@@ -132,31 +127,36 @@ void RenderingSystem::step( Scene& scene )
     // every components
     for(auto ent: renderables_view)
     {
-        auto& mesh_comp = renderables_view.get<components::Mesh>(ent);
-        auto& mesh = AssetManager::Instance()->get_mesh( mesh_comp.mesh_id );
-        auto& material_comp = renderables_view.get<components::Material>(ent);
+        auto& model_comp = renderables_view.get<components::Model>(ent);
+        Model* model = AssetManager::Instance()->get_model( model_comp.model_id );
 
-        // TODO: suli -> slow here, fix next
-        memcpy( vertex_buff_ptr,
-                mesh.vertex_data.data(), mesh.vertex_data.size() * sizeof(Vertex));
+        for( int i = 0; i < model->size(); i++ )
+        {
 
-        command_manager.bind_vertex_buffer( vertex_buffer );
-        command_manager.bind_index_buffer( index_buffer );
+            Mesh* mesh = model->mesh(i);
 
-        model_view_projection.model = model_mat * translate_mat * rotate_mat * scale_mat;;
+            // TODO: suli -> slow here, fix next
+            memcpy( vertex_buff_ptr,
+                    mesh->vertex_data.data(), mesh->vertex_data.size() * sizeof(Vertex));
 
-        memcpy( model_view_projection_ptr,
-                &model_view_projection,
-                sizeof(UniformModelViewProjection) );
 
-        command_manager.draw( pipeline,
-                              swapchain,
-                              {
-                                  &uniform_manager,
-                                  &material_comp.mat.descriptor_manager
-                              },
-                              mesh.vertex_data.size(),
-                              false );
+            command_manager.bind_vertex_buffer( vertex_buffer );
+            command_manager.bind_index_buffer( index_buffer );
+
+            model_view_projection.model = model_mat * translate_mat * rotate_mat * scale_mat;;
+
+            memcpy( model_view_projection_ptr,
+                    &model_view_projection,
+                    sizeof(UniformModelViewProjection) );
+
+            command_manager.draw( pipeline,
+                                  swapchain,
+                                  {
+                                      &uniform_manager,
+                                  },
+                                  mesh->vertex_data.size(),
+                                  false );
+        }
     }
 
     command_manager.end_render_pass();

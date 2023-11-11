@@ -55,6 +55,7 @@ void Engine::step()
 
 int Engine::close()
 {
+    AssetManager::Instance()->cleanup();
     RenderingSystem::Instance()->cleanup();
     Window::Instance()->cleanup();
     return 0;

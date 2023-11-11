@@ -6,6 +6,8 @@
 
 namespace rndrboi
 {
+    class AssetManager;
+
     // ----------------------------------------------------------------------------------------------------
 
     typedef int32_t ASSET_ID;
@@ -15,10 +17,21 @@ namespace rndrboi
 
     // ----------------------------------------------------------------------------------------------------
 
-    struct Model
+    // every mesh has a material
+    typedef std::pair<MESH_ID, MATERIAL_ID> MeshMatPair;
+
+    class Model
     {
-        std::vector<MESH_ID> meshes;
-        std::vector<MATERIAL_ID> materials;
+    public:
+        Mesh* mesh(int i);
+        MaterialTextured* material(int i);
+        int size();
+
+    private:
+        Model(){};
+        std::vector<MeshMatPair> meshes;
+        friend class AssetManager;
+
     };
 
     // ----------------------------------------------------------------------------------------------------
@@ -29,23 +42,49 @@ namespace rndrboi
 
         static AssetManager* Instance();
 
-        MESH_ID add_mesh();
-        MESH_ID add_cube();
-        Mesh& get_mesh( MESH_ID id );
+        // model --------------------------------------------------------------------------------
 
-        MATERIAL_ID add_textured_material();
-        MaterialTextured& get_material( MATERIAL_ID id );
+        // creates an empty model with no meshes or materials
+        MODEL_ID add_model();
+
+        // return the model associated with ID. Otherwise NULL
+        Model* get_model( MODEL_ID ID );
+
+        // add a mesh to the model. use the default material
+        void add_mesh_to_model( MODEL_ID model_id, MESH_ID mesh_id );
+
+        // mesh --------------------------------------------------------------------------------
+
+        // add an empty mesh
+        MESH_ID add_mesh();
+
+        // add a cube mesh
+        MESH_ID add_cube();
+
+        // get a mesh given a mesh ID. otherwise NULL
+        Mesh* get_mesh( MESH_ID id );
+
+        // material -----------------------------------------------------------------------------
+
+        // add a material and return it's ID
+        MATERIAL_ID add_material();
+
+        // get the material given a material ID. null on fail
+        MaterialTextured* get_material( MATERIAL_ID id );
+
+        void cleanup();
+
 
     private:
         AssetManager();
         ~AssetManager(){}
 
-        std::vector<Mesh*> meshes;
-        std::vector<MaterialTextured*> materials;
-        std::vector<Model*> models;
-
+        std::vector<Mesh*>              meshes;
+        std::vector<MaterialTextured*>  materials;
+        std::vector<Model*>             models;
 
         MESH_ID default_mesh;
+        MATERIAL_ID default_material;
 
         static AssetManager* instance;
     };
