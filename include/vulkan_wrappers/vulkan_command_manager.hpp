@@ -52,11 +52,18 @@ namespace rndrboi
 
         void present( Swapchain& swapchain, uint32_t image_index, Semaphore& wait_sem );
 
+        // snagged from: https://vkguide.dev/
+        void immediate_submit( std::function<void(VkCommandBuffer cmd)>&& function );
+
         VkCommandPool command_pool;
         VkCommandBuffer command_buffer;
 
     private:
         VulkanDevice* internal_dev;
+
+        VkCommandBuffer immediate_command_buffer;
+        VkCommandPool immediate_command_pool;
+        Fence immediate_fence;
 
     };
 }

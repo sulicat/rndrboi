@@ -55,7 +55,7 @@ void Fence::create( VulkanDevice& dev, bool is_signaled )
                                   &vk_fence );
 
     if( res != VK_SUCCESS )
-        std::cout << BAD_PRINT << "ERROR could not create semaphore\n";
+        std::cout << BAD_PRINT << "ERROR could not create fence\n";
 }
 
 void Fence::clean()

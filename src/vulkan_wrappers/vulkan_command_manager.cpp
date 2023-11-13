@@ -20,11 +20,17 @@ void CommandManager::create( VulkanDevice& dev, CommandManagerSettings settings 
     pool_create_info.flags            = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
     pool_create_info.queueFamilyIndex = dev.queue_fam_info.graphics_family_index;
 
+    // main command pool
     VkResult res = vkCreateCommandPool( dev.logical_device, &pool_create_info, nullptr, &command_pool );
 
     if( res != VK_SUCCESS )
         std::cout << BAD_PRINT << "ERROR could not create command pool\n";
 
+
+    // immediate command pool
+    res = vkCreateCommandPool( dev.logical_device, &pool_create_info, nullptr, &immediate_command_pool );
+    if( res != VK_SUCCESS )
+        std::cout << BAD_PRINT << "ERROR could not create immediate command pool\n";
 
     // create command buffers
     if( settings.num_command_buffers < 1 )
@@ -32,6 +38,7 @@ void CommandManager::create( VulkanDevice& dev, CommandManagerSettings settings 
         std::cout << OK_PRINT << "requested: " << settings.num_command_buffers << " Command buffers... min is 1, creating min\n";
         settings.num_command_buffers = 1;
     }
+
 
     VkCommandBufferAllocateInfo allocate_info{};
     allocate_info.sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -43,6 +50,23 @@ void CommandManager::create( VulkanDevice& dev, CommandManagerSettings settings 
 
     if( res != VK_SUCCESS )
         std::cout << BAD_PRINT << "ERROR Failed to allocate command buffer\n";
+
+
+    // immediate command buffer
+    VkCommandBufferAllocateInfo immediate_allocate_info{};
+    immediate_allocate_info.sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    immediate_allocate_info.commandPool        = immediate_command_pool;
+    immediate_allocate_info.level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    immediate_allocate_info.commandBufferCount = 1;
+
+    res = vkAllocateCommandBuffers( dev.logical_device, &immediate_allocate_info, &immediate_command_buffer );
+
+    if( res != VK_SUCCESS )
+        std::cout << BAD_PRINT << "ERROR Failed to allocate immediate command buffer\n";
+
+
+    immediate_fence.create( dev );
+
 }
 
 void CommandManager::reset()
@@ -175,6 +199,48 @@ void CommandManager::submit( Semaphore& wait_sem, Semaphore signal_sem, Fence co
         std::cout << BAD_PRINT << "ERROR could not submit command buffer\n";
 }
 
+
+void CommandManager::immediate_submit( std::function<void(VkCommandBuffer cmd)>&& function )
+{
+    // begin
+    VkCommandBufferBeginInfo begin_info{};
+    begin_info.sType            = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    begin_info.flags            = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+    begin_info.pInheritanceInfo = nullptr;
+    VkResult res = vkBeginCommandBuffer( command_buffer, &begin_info );
+    if( res != VK_SUCCESS )
+        std::cout << BAD_PRINT << "ERROR immediate could not begin recording on buffer\n";
+
+    function( command_buffer );
+
+    res = vkEndCommandBuffer( command_buffer );
+    if( res != VK_SUCCESS )
+        std::cout << BAD_PRINT << "ERROR immediate could not end recording on buffer\n";
+
+    // no semaphores submit info
+    VkSubmitInfo submit{};
+    submit.sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submit.pNext                = nullptr;
+    submit.waitSemaphoreCount   = 0;
+    submit.pWaitSemaphores      = nullptr;
+    submit.pWaitDstStageMask    = nullptr;
+    submit.commandBufferCount   = 1;
+    submit.pCommandBuffers      = &immediate_command_buffer;
+    submit.signalSemaphoreCount = 0;
+    submit.pSignalSemaphores    = nullptr;
+
+    res = vkQueueSubmit( internal_dev->graphics_queue, 1, &submit, immediate_fence.vk_fence );
+    if( res != VK_SUCCESS )
+        std::cout << BAD_PRINT << "ERROR immediate could not submit queue\n";
+
+    immediate_fence.wait();
+    immediate_fence.reset();
+
+
+
+}
+
+
 void CommandManager::present( Swapchain& swapchain, uint32_t image_index, Semaphore& wait_sem )
 {
     VkSwapchainKHR swapchains[] = {swapchain.swapchain};
@@ -195,5 +261,7 @@ void CommandManager::present( Swapchain& swapchain, uint32_t image_index, Semaph
 
 void CommandManager::clean()
 {
+    vkDestroyCommandPool( internal_dev->logical_device, immediate_command_pool, nullptr );
     vkDestroyCommandPool( internal_dev->logical_device, command_pool, nullptr );
+    immediate_fence.clean();
 }

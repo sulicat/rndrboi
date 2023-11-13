@@ -14,6 +14,6 @@ layout(set = 1, binding = 3) uniform sampler2D tex_3;
 layout(set = 1, binding = 4) uniform sampler2D tex_4;
 
 void main() {
-    //outColor = vec4(pos, 1.0);
-    outColor = texture( tex_0, uv );
+    outColor = vec4(pos, 1.0);
+    //outColor = texture( tex_0, uv );
 }
