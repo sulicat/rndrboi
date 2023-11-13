@@ -3,6 +3,7 @@
 #include "mesh.hpp"
 #include "texture.hpp"
 #include "material_textured.hpp"
+#include "vulkan_wrappers/vulkan_command_manager.hpp"
 
 namespace rndrboi
 {

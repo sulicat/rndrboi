@@ -112,7 +112,7 @@ namespace rndrboi
 
     struct BufferSettings
     {
-        uint32_t buffer_size        = 65563;
+        uint32_t buffer_size        = 1000000;
         VkBufferUsageFlags usage    = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT; // vertex buffer by default
         
         VkSharingMode sharing_mode  = VK_SHARING_MODE_EXCLUSIVE;

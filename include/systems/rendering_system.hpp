@@ -35,6 +35,7 @@ namespace rndrboi
     public:
 
         void init();
+        void setup( Scene& scene );
         void step( Scene& scene );
         void cleanup();
 

@@ -48,6 +48,15 @@ bool Engine::is_running()
 
 void Engine::step()
 {
+    // ahh my eyes
+    static bool do_once = false;
+    if( do_once == false )
+    {
+        RenderingSystem::Instance()->setup( *scene ); // dirty fix pls
+        do_once = true;
+    }
+
+
     window->handle_input();
     InputSystem::Instance()->step();
     RenderingSystem::Instance()->step( *scene );

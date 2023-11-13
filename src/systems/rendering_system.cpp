@@ -92,6 +92,91 @@ void RenderingSystem::init()
     command_manager.create( device_data, {} );
 }
 
+void RenderingSystem::setup( Scene& scene )
+{
+
+    std::cout << ATTENTION_PRINT << "Setup\n";
+
+    auto renderables_view = scene.registry->view< components::Renderable,
+                                                  components::Model >();
+
+
+    for(auto ent: renderables_view)
+    {
+        auto& model_comp = renderables_view.get<components::Model>(ent);
+        Model* model = AssetManager::Instance()->get_model( model_comp.model_id );
+
+        for( int i = 0; i < model->size(); i++ )
+        {
+
+            Mesh* mesh = model->mesh(i);
+            MaterialTextured* material = model->material(i);
+            VulkanTexture& diff_texture = material->diffuse_texture;
+
+            // check to make sure every texture is transitioned properly
+            // for now just transition them here
+            command_manager.immediate_submit( [=](VkCommandBuffer cmd){
+
+                std::cout << "SUBMIT\n";
+
+		VkImageSubresourceRange range;
+		range.aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT;
+		range.baseMipLevel   = 0;
+		range.levelCount     = 1;
+		range.baseArrayLayer = 0;
+		range.layerCount     = 1;
+
+		VkImageMemoryBarrier imageBarrier_toTransfer = {};
+		imageBarrier_toTransfer.sType            = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+		imageBarrier_toTransfer.oldLayout        = VK_IMAGE_LAYOUT_UNDEFINED;
+		imageBarrier_toTransfer.newLayout        = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+		imageBarrier_toTransfer.image            = diff_texture.image->image;
+		imageBarrier_toTransfer.subresourceRange = range;
+
+		imageBarrier_toTransfer.srcAccessMask = 0;
+		imageBarrier_toTransfer.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+
+		//barrier the image into the transfer-receive layout
+		vkCmdPipelineBarrier( cmd,
+                                      VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+                                      VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageBarrier_toTransfer);
+
+		VkBufferImageCopy copyRegion = {};
+		copyRegion.bufferOffset = 0;
+		copyRegion.bufferRowLength = 0;
+		copyRegion.bufferImageHeight = 0;
+
+		copyRegion.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		copyRegion.imageSubresource.mipLevel = 0;
+		copyRegion.imageSubresource.baseArrayLayer = 0;
+		copyRegion.imageSubresource.layerCount = 1;
+		copyRegion.imageExtent = {diff_texture.width, diff_texture.height, 1};
+
+		//copy the buffer into the image
+		vkCmdCopyBufferToImage(cmd,
+                                       diff_texture.staging_buffer->buffer,
+                                       diff_texture.image->image,
+                                       VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                                       1,
+                                       &copyRegion);
+
+		VkImageMemoryBarrier imageBarrier_toReadable = imageBarrier_toTransfer;
+		imageBarrier_toReadable.oldLayout            = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+		imageBarrier_toReadable.newLayout            = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		imageBarrier_toReadable.srcAccessMask        = VK_ACCESS_TRANSFER_WRITE_BIT;
+		imageBarrier_toReadable.dstAccessMask        = VK_ACCESS_SHADER_READ_BIT;
+
+		//barrier the image into the shader readable layout
+		vkCmdPipelineBarrier(cmd, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageBarrier_toReadable);
+
+
+            });
+
+
+        }
+    }
+}
+
 void RenderingSystem::step( Scene& scene )
 {
     // wait till the last frame is done drawing
