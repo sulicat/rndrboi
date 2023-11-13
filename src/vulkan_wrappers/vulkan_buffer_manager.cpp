@@ -56,7 +56,7 @@ Buffer* BufferManager::get_buffer( BufferSettings settings )
     buffer_create_info.sharingMode  = settings.sharing_mode;
 
     VmaAllocationCreateInfo alloc_info = {};
-    alloc_info.usage = VMA_MEMORY_USAGE_AUTO;
+    alloc_info.usage = VMA_MEMORY_USAGE_AUTO; // TODO: suli -> change me prolly slow
     alloc_info.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT; // host accesible
 
     Buffer* buffer_out = new Buffer( settings.buffer_size );

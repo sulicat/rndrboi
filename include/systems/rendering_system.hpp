@@ -62,9 +62,11 @@ namespace rndrboi
         UniformModelViewProjection model_view_projection;
         void* model_view_projection_ptr;
 
+        rndrboi::Buffer* vertex_buffer_staging;
         rndrboi::Buffer* vertex_buffer;
+        void* vertex_buff_staging_ptr;
+
         rndrboi::Buffer* index_buffer;
-        void* vertex_buff_ptr;
 
         MaterialTextured* material_template_textured;
 

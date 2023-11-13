@@ -207,13 +207,13 @@ void CommandManager::immediate_submit( std::function<void(VkCommandBuffer cmd)>&
     begin_info.sType            = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
     begin_info.flags            = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
     begin_info.pInheritanceInfo = nullptr;
-    VkResult res = vkBeginCommandBuffer( command_buffer, &begin_info );
+    VkResult res = vkBeginCommandBuffer( immediate_command_buffer, &begin_info );
     if( res != VK_SUCCESS )
         std::cout << BAD_PRINT << "ERROR immediate could not begin recording on buffer\n";
 
-    function( command_buffer );
+    function( immediate_command_buffer );
 
-    res = vkEndCommandBuffer( command_buffer );
+    res = vkEndCommandBuffer( immediate_command_buffer );
     if( res != VK_SUCCESS )
         std::cout << BAD_PRINT << "ERROR immediate could not end recording on buffer\n";
 

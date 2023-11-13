@@ -77,9 +77,11 @@ void RenderingSystem::init()
 
                      });
 
-    // create a vertex buffer
-    vertex_buffer = BufferManager::Instance()->get_buffer({ .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT });
-    vertex_buff_ptr = BufferManager::Instance()->get_mapped_memory( *vertex_buffer );
+
+    vertex_buffer_staging = BufferManager::Instance()->get_buffer({ .usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT });
+    vertex_buffer         = BufferManager::Instance()->get_buffer({ .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT });
+
+    vertex_buff_staging_ptr = BufferManager::Instance()->get_mapped_memory( *vertex_buffer_staging );
 
     // create a vertex buffer
     index_buffer = BufferManager::Instance()->get_buffer({ .usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT });
@@ -137,9 +139,20 @@ void RenderingSystem::step( Scene& scene )
             Mesh* mesh = model->mesh(i);
             MaterialTextured* material = model->material(i);
 
-            // TODO: suli -> slow here, fix next
-            memcpy( vertex_buff_ptr,
+            memcpy( vertex_buff_staging_ptr,
                     mesh->vertex_data.data(), mesh->vertex_data.size() * sizeof(Vertex));
+
+            command_manager.immediate_submit( [this](VkCommandBuffer cmd){
+                VkBufferCopy copy;
+		copy.dstOffset = 0;
+		copy.srcOffset = 0;
+		copy.size = vertex_buffer->get_size();
+		vkCmdCopyBuffer( cmd,
+                                 vertex_buffer_staging->buffer,
+                                 vertex_buffer->buffer,
+                                 1,
+                                 &copy );
+            });
 
             command_manager.bind_vertex_buffer( vertex_buffer );
             command_manager.bind_index_buffer( index_buffer );
