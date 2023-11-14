@@ -64,8 +64,12 @@ void Engine::step()
 
 int Engine::close()
 {
-    AssetManager::Instance()->cleanup();
     RenderingSystem::Instance()->cleanup();
+    AssetManager::Instance()->cleanup();
+    BufferManager::Instance()->clean();
+    VulkanDeviceInit::clean( Device::Instance()->device );
+
     Window::Instance()->cleanup();
+
     return 0;
 }

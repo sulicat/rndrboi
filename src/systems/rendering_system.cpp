@@ -117,8 +117,6 @@ void RenderingSystem::setup( Scene& scene )
             // for now just transition them here
             command_manager.immediate_submit( [=](VkCommandBuffer cmd){
 
-                std::cout << "SUBMIT\n";
-
 		VkImageSubresourceRange range;
 		range.aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT;
 		range.baseMipLevel   = 0;
@@ -168,7 +166,6 @@ void RenderingSystem::setup( Scene& scene )
 
 		//barrier the image into the shader readable layout
 		vkCmdPipelineBarrier(cmd, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageBarrier_toReadable);
-
 
             });
 
@@ -299,8 +296,4 @@ void RenderingSystem::cleanup()
     render_pass.clean();
     pipeline.clean();
     swapchain.clean();
-
-    BufferManager::Instance()->clean();
-    VulkanDeviceInit::clean( device_data );
-
 }

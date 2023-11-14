@@ -294,7 +294,6 @@ void DescriptorManager::clean()
         delete sampler;
     }
 
-
     for( auto& uni : uniforms )
     {
         std::cout << OK_PRINT << " Cleaned uniform: " << uni->name << "\n";
