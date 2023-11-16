@@ -32,10 +32,10 @@ void BufferManager::init( VulkanDevice& dev )
     internal_device = &dev;
 
     VmaAllocatorCreateInfo allocator_create_info = {};
-    allocator_create_info.physicalDevice    = dev.physical_device;
-    allocator_create_info.device        = dev.logical_device;
-    allocator_create_info.instance      = dev.instance;
-    allocator_create_info.pVulkanFunctions  = NULL;
+    allocator_create_info.physicalDevice   = dev.physical_device;
+    allocator_create_info.device           = dev.logical_device;
+    allocator_create_info.instance         = dev.instance;
+    allocator_create_info.pVulkanFunctions = NULL;
 
     VkResult res = vmaCreateAllocator( &allocator_create_info, &allocator );
     if( res != VK_SUCCESS )
@@ -50,10 +50,10 @@ Buffer* BufferManager::get_buffer( BufferSettings settings )
         std::cout << BAD_PRINT << "ERROR Need to call init( dev ) on buffer manager\n";
 
     VkBufferCreateInfo buffer_create_info{};
-    buffer_create_info.sType        = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-    buffer_create_info.size     = settings.buffer_size;
-    buffer_create_info.usage        = settings.usage;
-    buffer_create_info.sharingMode  = settings.sharing_mode;
+    buffer_create_info.sType       = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    buffer_create_info.size        = settings.buffer_size;
+    buffer_create_info.usage       = settings.usage;
+    buffer_create_info.sharingMode = settings.sharing_mode;
 
     VmaAllocationCreateInfo alloc_info = {};
     alloc_info.usage = VMA_MEMORY_USAGE_AUTO; // TODO: suli -> change me prolly slow
@@ -75,7 +75,7 @@ Buffer* BufferManager::get_buffer( BufferSettings settings )
     return buffer_out;
 }
 
-ImageBuffer* BufferManager::get_image_buffer( ImageBufferSettings settings )
+ImageBuffer* BufferManager::get_image_buffer( ImageBufferSettings settings, bool gpu_only )
 {
     if( !is_initialized )
         std::cout << BAD_PRINT << "ERROR Need to call init( dev ) on buffer manager\n";
@@ -85,6 +85,9 @@ ImageBuffer* BufferManager::get_image_buffer( ImageBufferSettings settings )
     VmaAllocationCreateInfo alloc_info = {};
     alloc_info.usage = VMA_MEMORY_USAGE_AUTO;
     alloc_info.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT; // host accesible
+
+    if( gpu_only )
+        alloc_info.usage = VMA_MEMORY_USAGE_GPU_ONLY;
 
     VkResult res = vmaCreateImage( allocator,
                                    &settings.create_info,

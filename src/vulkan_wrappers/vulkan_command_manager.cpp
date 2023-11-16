@@ -116,8 +116,14 @@ void CommandManager::begin_render_pass( RenderPass& render_pass,
     render_pass_info.renderArea.extent = swapchain.image_extent;
 
     VkClearValue clear_color = {{{ 1.0f, 0.0f, 1.0f, 1.0f }}};
-    render_pass_info.clearValueCount = 1;
-    render_pass_info.pClearValues = &clear_color;
+
+    VkClearValue depth_clear;
+    depth_clear.depthStencil.depth = 0.f;
+
+
+    VkClearValue clear_values[] = { clear_color, depth_clear };
+    render_pass_info.clearValueCount = 2;
+    render_pass_info.pClearValues = &clear_values[0];
 
     vkCmdBeginRenderPass(command_buffer, &render_pass_info, VK_SUBPASS_CONTENTS_INLINE);
 

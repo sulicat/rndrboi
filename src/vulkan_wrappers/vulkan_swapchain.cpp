@@ -100,15 +100,60 @@ void Swapchain::create( VulkanDevice& dev )
 
     create_image_views( dev );
 
+    create_depth_image( dev );
+
     dev_internal = &dev;
     complete = true;
 }
 
+void Swapchain::create_depth_image( VulkanDevice& dev )
+{
+    std::cout << image_extent.width << " " << image_extent.height << "\n";
+
+    VkImageCreateInfo info = {};
+
+    info.sType         = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+    info.imageType     = VK_IMAGE_TYPE_2D;
+    info.format        = VK_FORMAT_D32_SFLOAT;
+    info.extent.width  = (uint32_t)image_extent.width;
+    info.extent.height = (uint32_t)image_extent.height;
+    info.extent.depth  = 1;
+    info.mipLevels     = 1;
+    info.arrayLayers   = 1;
+    info.samples       = VK_SAMPLE_COUNT_1_BIT;
+    info.tiling        = VK_IMAGE_TILING_OPTIMAL;
+    info.usage         = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+    info.flags         = 0;
+
+    depth_image = BufferManager::Instance()->get_image_buffer( { .create_info = info}, true );
+
+    // create image view
+    VkImageViewCreateInfo imview_info = {};
+    imview_info.sType                           = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+    imview_info.pNext                           = nullptr;
+    imview_info.viewType                        = VK_IMAGE_VIEW_TYPE_2D;
+    imview_info.image                           = depth_image->image;
+    imview_info.format                          = info.format;
+    imview_info.subresourceRange.baseMipLevel   = 0;
+    imview_info.subresourceRange.levelCount     = 1;
+    imview_info.subresourceRange.baseArrayLayer = 0;
+    imview_info.subresourceRange.layerCount     = 1;
+    imview_info.subresourceRange.aspectMask     = VK_IMAGE_ASPECT_DEPTH_BIT;
+
+    VkResult res = vkCreateImageView(dev.logical_device, &imview_info, nullptr, &depth_image_view);
+    if( res != VK_SUCCESS )
+        std::cout << BAD_PRINT << "Failed to create depth image view\n";
+
+
+}
 
 void Swapchain::clean()
 {
     for( auto im : image_views )
         vkDestroyImageView( dev_internal->logical_device, im, nullptr );
+
+    // depth image
+    vkDestroyImageView( dev_internal->logical_device, depth_image_view, nullptr );
 
     vkDestroySwapchainKHR(dev_internal->logical_device, swapchain, nullptr);
 

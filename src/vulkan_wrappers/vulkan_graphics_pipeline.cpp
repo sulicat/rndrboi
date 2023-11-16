@@ -122,8 +122,16 @@ void GraphicsPipeline::create( VulkanDevice& dev, RenderPass& render_pass, Graph
     multisampling_create_info.alphaToOneEnable      = VK_FALSE; // Optional
 
     // depth and Stencil buffers
-    // not used for now
     VkPipelineDepthStencilStateCreateInfo depth_stencil_create_info{};
+    depth_stencil_create_info.sType                 = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+    depth_stencil_create_info.pNext                 = nullptr;
+    depth_stencil_create_info.depthTestEnable       = settings.depth_test ? VK_TRUE : VK_FALSE;
+    depth_stencil_create_info.depthWriteEnable      = settings.depth_write ? VK_TRUE : VK_FALSE;
+    depth_stencil_create_info.depthCompareOp        = settings.depth_test ? settings.depth_comp_op : VK_COMPARE_OP_ALWAYS;
+    depth_stencil_create_info.depthBoundsTestEnable = VK_FALSE;
+    depth_stencil_create_info.minDepthBounds        = 0.0f; // Optional
+    depth_stencil_create_info.maxDepthBounds        = 1.0f; // Optional
+    depth_stencil_create_info.stencilTestEnable     = VK_FALSE;
 
     // alpha blend setup
     VkPipelineColorBlendAttachmentState color_blend_attachment_create_info{};
@@ -183,7 +191,7 @@ void GraphicsPipeline::create( VulkanDevice& dev, RenderPass& render_pass, Graph
     pipeline_create_info.pViewportState      = &viewport_state_create_info;
     pipeline_create_info.pRasterizationState = &rasterizer_create_info;
     pipeline_create_info.pMultisampleState   = &multisampling_create_info;
-    pipeline_create_info.pDepthStencilState  = nullptr;
+    pipeline_create_info.pDepthStencilState  = &depth_stencil_create_info;
     pipeline_create_info.pColorBlendState    = &color_blend_create_info;
     pipeline_create_info.pDynamicState       = &dynamic_state_create_info;
     pipeline_create_info.layout              = pipeline_layout;

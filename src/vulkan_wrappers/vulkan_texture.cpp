@@ -97,6 +97,7 @@ void VulkanTexture::from_data( char* data, int w_in, int h_in, int ch_in )
 
 void VulkanTexture::clean()
 {
+
     vkDestroyImageView( internal_device->logical_device,
                         image_view,
                         nullptr );

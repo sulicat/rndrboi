@@ -81,7 +81,7 @@ namespace rndrboi
 
         void init( VulkanDevice& dev );
         Buffer* get_buffer( BufferSettings settings );
-        ImageBuffer* get_image_buffer( ImageBufferSettings settings );
+        ImageBuffer* get_image_buffer( ImageBufferSettings settings, bool gpu_only = false );
 
         void* get_mapped_memory( Buffer& buff );
         void* get_mapped_memory( ImageBuffer& buff );

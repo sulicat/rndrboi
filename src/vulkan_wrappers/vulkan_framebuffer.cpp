@@ -23,16 +23,16 @@ void Framebuffer::create( VulkanDevice& dev, Swapchain& swapchain, RenderPass& r
 
     for( int i = 0; i < swapchain.image_views.size(); i++ )
     {
-        VkImageView attachments[] = { swapchain.image_views[i] };
+        VkImageView attachments[2] = { swapchain.image_views[i], swapchain.depth_image_view };
 
         VkFramebufferCreateInfo framebuffer_create_info{};
-        framebuffer_create_info.sType       = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-        framebuffer_create_info.renderPass  = render_pass.render_pass;
-        framebuffer_create_info.attachmentCount = 1;
+        framebuffer_create_info.sType           = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+        framebuffer_create_info.renderPass      = render_pass.render_pass;
+        framebuffer_create_info.attachmentCount = 2;
         framebuffer_create_info.pAttachments    = attachments;
-        framebuffer_create_info.width       = swapchain.width();
-        framebuffer_create_info.height      = swapchain.height();
-        framebuffer_create_info.layers      = 1;
+        framebuffer_create_info.width           = swapchain.width();
+        framebuffer_create_info.height          = swapchain.height();
+        framebuffer_create_info.layers          = 1;
 
         VkResult res = vkCreateFramebuffer( dev.logical_device, &framebuffer_create_info, nullptr, &swapchain_framebuffers[i] );
 
