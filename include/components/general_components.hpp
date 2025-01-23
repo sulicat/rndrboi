@@ -1,4 +1,0 @@
-namespace rndrboi::components
-{
-
-};
